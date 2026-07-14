@@ -1,6 +1,6 @@
 <!-- Badges -->
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![CI](https://github.com/sachn-cs/delta-search/actions/workflows/ci.yml/badge.svg)](https://github.com/sachn-cs/delta-search/actions/workflows/ci.yml)
+[![CI](https://github.com/sachncs/delta-search/actions/workflows/ci.yml/badge.svg)](https://github.com/sachncs/delta-search/actions/workflows/ci.yml)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![PyPI version](https://img.shields.io/pypi/v/delta-search.svg)](https://pypi.org/project/delta-search/)
 [![Downloads](https://img.shields.io/pypi/dm/delta-search.svg)](https://pypi.org/project/delta-search/)
@@ -34,7 +34,7 @@ A general, fast heuristic framework for solving NP-hard subgraph extraction prob
 pip install delta-search
 
 # From source (recommended for development)
-git clone https://github.com/sachn-cs/delta-search.git
+git clone https://github.com/sachncs/delta-search.git
 cd delta-search
 pip install -e ".[dev]"
 ```
@@ -304,7 +304,7 @@ If you use this **algorithm** in your research, please cite the original paper b
 }
 ```
 
-If you use this **software** (the Python implementation), please also credit [Sachin (sachn-cs)](https://github.com/sachn-cs).
+If you use this **software** (the Python implementation), please also credit [Sachin (sachncs)](https://github.com/sachncs).
 
 ## License
 

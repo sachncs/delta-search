@@ -10,10 +10,10 @@ readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.10"
 authors = [
-    {name = "Sachin (sachn-cs)", email = "sachncs@gmail.com"},
+    {name = "Sachin", email = "sachncs@gmail.com"},
 ]
 maintainers = [
-    {name = "Sachin (sachn-cs)", email = "sachncs@gmail.com"},
+    {name = "Sachin", email = "sachncs@gmail.com"},
 ]
 keywords = [
     "graph-theory",
@@ -46,11 +46,11 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/sachn-cs/delta-search"
-Repository = "https://github.com/sachn-cs/delta-search"
-"Bug Tracker" = "https://github.com/sachn-cs/delta-search/issues"
-Documentation = "https://github.com/sachn-cs/delta-search#readme"
-Changelog = "https://github.com/sachn-cs/delta-search/blob/master/CHANGELOG.md"
+Homepage = "https://github.com/sachncs/delta-search"
+Repository = "https://github.com/sachncs/delta-search"
+"Bug Tracker" = "https://github.com/sachncs/delta-search/issues"
+Documentation = "https://github.com/sachncs/delta-search#readme"
+Changelog = "https://github.com/sachncs/delta-search/blob/master/CHANGELOG.md"
 "arXiv" = "https://arxiv.org/abs/2606.13834"
 
 [project.scripts]

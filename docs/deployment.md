@@ -13,7 +13,7 @@ pip install delta-search
 ### From Source
 
 ```bash
-git clone https://github.com/sachn-cs/delta-search.git
+git clone https://github.com/sachncs/delta-search.git
 cd delta-search
 pip install -e .
 ```
