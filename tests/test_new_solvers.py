@@ -196,7 +196,9 @@ class TestMultiObjective:
             weights=[0.5, 0.5],
         )
         solver = MultiObjectiveSolver(
-            problem, objective_weights=weights, max_pareto_size=2,
+            problem,
+            objective_weights=weights,
+            max_pareto_size=2,
         )
         result = solver.solve(max_iterations=100)
         assert len(result.pareto_front) <= 2
@@ -240,7 +242,10 @@ class TestLearnedGuidance:
     def test_custom_sklearn_params(self) -> None:
         problem = self._make_problem()
         solver = LearnedGuidanceSolver(
-            problem, min_samples=5, n_estimators=5, max_depth=2,
+            problem,
+            min_samples=5,
+            n_estimators=5,
+            max_depth=2,
         )
         result = solver.solve(max_iterations=100)
         assert result["best_state"] is not None
