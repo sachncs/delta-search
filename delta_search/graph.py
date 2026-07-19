@@ -563,11 +563,10 @@ class Graph(Generic[NodeT]):
 class ThreadSafeGraph(Graph[NodeT]):
     """Thread-safe wrapper around ``Graph``.
 
-    All public mutating methods acquire a reentrant lock.  Read-only
-    properties (``nodes``, ``edges``, ``num_nodes``, ``num_edges``) are
-    not locked because they return views or cached integers -- but
-    the caller must hold the lock if they need a consistent snapshot
-    across multiple reads.
+    All public methods acquire a reentrant lock.  Read-only properties
+    (``nodes``, ``edges``, ``num_nodes``, ``num_edges``) are not locked
+    because they return views or cached integers -- but the caller must
+    hold the lock if they need a consistent snapshot across multiple reads.
 
     Usage::
 
@@ -792,3 +791,28 @@ class ThreadSafeGraph(Graph[NodeT]):
         """Thread-safe graph clear."""
         with self.lock:
             super().clear()
+
+    def subgraph(self, nodes: Iterable[NodeT]) -> Graph[NodeT]:
+        """Thread-safe induced subgraph."""
+        with self.lock:
+            return super().subgraph(nodes)
+
+    def edge_subgraph(self, edge_keys: Iterable[frozenset[NodeT]]) -> Graph[NodeT]:
+        """Thread-safe edge-induced subgraph."""
+        with self.lock:
+            return super().edge_subgraph(edge_keys)
+
+    def node_list(self) -> list[NodeT]:
+        """Thread-safe node materialization."""
+        with self.lock:
+            return super().node_list()
+
+    def degree_sequence(self) -> list[int]:
+        """Thread-safe degree sequence."""
+        with self.lock:
+            return super().degree_sequence()
+
+    def is_subgraph_of(self, other: Graph[NodeT]) -> bool:
+        """Thread-safe subgraph check."""
+        with self.lock:
+            return super().is_subgraph_of(other)
