@@ -17,6 +17,7 @@ Usage::
 
 from __future__ import annotations
 
+import random
 import time
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Generic
@@ -115,6 +116,9 @@ def _extract_features(
 
 def _train_model(
     training_data: list[tuple[dict[str, float], float]],
+    n_estimators: int = 10,
+    max_depth: int = 3,
+    learning_rate: float = 0.1,
 ) -> Any:
     """Train a lightweight gradient boosting model.
 
@@ -138,9 +142,9 @@ def _train_model(
     targets = [d[1] for d in training_data]
 
     model = GradientBoostingRegressor(
-        n_estimators=10,
-        max_depth=3,
-        learning_rate=0.1,
+        n_estimators=n_estimators,
+        max_depth=max_depth,
+        learning_rate=learning_rate,
         random_state=42,
     )
     model.fit(features_list, targets)
@@ -163,6 +167,9 @@ class LearnedGuidanceSolver(Generic[NodeT]):
         train_every: Retrain the model every N iterations.
         min_samples: Minimum training samples before using the model.
         exploration_rate: Probability of exploring a random action.
+        n_estimators: Number of boosting stages for gradient boosting.
+        max_depth: Maximum depth of individual regression estimators.
+        learning_rate: Learning rate shrinks the contribution of each tree.
 
     """
 
@@ -173,6 +180,9 @@ class LearnedGuidanceSolver(Generic[NodeT]):
         train_every: int = 10,
         min_samples: int = 20,
         exploration_rate: float = 0.1,
+        n_estimators: int = 10,
+        max_depth: int = 3,
+        learning_rate: float = 0.1,
     ) -> None:
         """Initialize the learned guidance solver.
 
@@ -182,6 +192,9 @@ class LearnedGuidanceSolver(Generic[NodeT]):
             train_every: Retrain the model every N iterations.
             min_samples: Minimum training samples before using the model.
             exploration_rate: Probability of exploring a random action.
+            n_estimators: Number of boosting stages for gradient boosting.
+            max_depth: Maximum depth of individual regression estimators.
+            learning_rate: Learning rate shrinks the contribution of each tree.
 
         """
         self.problem = problem
@@ -189,6 +202,9 @@ class LearnedGuidanceSolver(Generic[NodeT]):
         self.train_every = train_every
         self.min_samples = min_samples
         self.exploration_rate = exploration_rate
+        self.n_estimators = n_estimators
+        self.max_depth = max_depth
+        self.learning_rate = learning_rate
         self._training_data: list[tuple[dict[str, float], float]] = []
         self._model: Any = None
 
@@ -243,9 +259,7 @@ class LearnedGuidanceSolver(Generic[NodeT]):
                 break
 
             # Score actions
-            import random as _random
-
-            if self._model is not None and _random.random() >= self.exploration_rate:
+            if self._model is not None and random.random() >= self.exploration_rate:
                 scored = self._score_actions(
                     state,
                     actions,
@@ -292,7 +306,12 @@ class LearnedGuidanceSolver(Generic[NodeT]):
                 iteration % self.train_every == 0
                 and len(self._training_data) >= self.min_samples
             ):
-                self._model = _train_model(self._training_data)
+                self._model = _train_model(
+                    self._training_data,
+                    n_estimators=self.n_estimators,
+                    max_depth=self.max_depth,
+                    learning_rate=self.learning_rate,
+                )
                 model_trained = self._model is not None
 
             state = self.problem.apply_action(state, best_action)
