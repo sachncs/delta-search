@@ -282,6 +282,8 @@ class AnytimeSolver(Generic[NodeT]):
                 elapsed_ms=elapsed_ms,
             )
         )
+        if self.max_history is not None and len(progress) > self.max_history:
+            progress.pop(0)  # ponytail: drop oldest
 
         if observer:
             observer.on_convergence(iteration + 1, best_objective)

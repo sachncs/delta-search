@@ -21,6 +21,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Progress bar (tqdm) and streaming observer output
 - Streaming graph mutations with resume support
 - Multi-start solver with random initial state generation
+- `max_history` param for `AnytimeSolver` to cap snapshot memory
+- `max_pareto_size` param for `MultiObjectiveSolver` to cap Pareto front
+- Configurable sklearn hyperparams for `LearnedGuidanceSolver`
+- Configurable seed for `AblationStudy` and `ScalingStudy` graph generation
+- Context manager support for `StreamingObserver`
+- Thread-safe wrappers for `ThreadSafeGraph.subgraph`, `edge_subgraph`,
+  `node_list`, `degree_sequence`, `is_subgraph_of`
 
 ### Changed
 
@@ -32,9 +39,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Type hierarchy LSP violations in context_engineering and test_time_compute
-- Removed all `# type: ignore` comments through proper type fixes
-- Fixed file handle leak in StreamingObserver with proper cleanup
+- CLI logging now configured with `basicConfig` so output is visible
+- File handle leak in `StreamingObserver` guarded against double-start
+- Removed unused `logger` definitions from 8 modules
+- Moved inline `import random` to module top level in `learned.py`
+- Removed hardcoded `Random(42)` in ablation graph generation
 
 ## [0.1.0] - 2026-06-15
 

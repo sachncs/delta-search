@@ -34,15 +34,18 @@ pre-commit install
 - Monitor memory usage with `tracemalloc` or system tools
 - Consider chunking extremely large graphs (100K+ nodes)
 - Use `ThreadSafeGraph` only when concurrent access is required
+- Cap snapshot history with `AnytimeSolver(..., max_history=N)`
+- Cap Pareto front with `MultiObjectiveSolver(..., max_pareto_size=N)`
 
 ### Thread Safety
 
 ```python
 from delta_search import ThreadSafeGraph, GreedySolver
 
-# ThreadSafeGraph wraps all mutations with RLock
+# ThreadSafeGraph wraps all methods (including reads) with RLock
 graph = ThreadSafeGraph[int]()
 graph.add_edge(1, 2)
+sub = graph.subgraph([1, 2])  # Thread-safe
 
 # Each solver instance must have its own problem instance
 # Graph can be shared via ThreadSafeGraph
@@ -172,6 +175,8 @@ logging.basicConfig(level=logging.DEBUG)
 
 # This will show detailed solver progress
 from delta_search import StreamingObserver
-observer = StreamingObserver(verbose=True)
-solver.solve(max_iterations=100, observer=observer)
+
+# Context manager ensures log file is properly closed
+with StreamingObserver(verbose=True, log_file="debug.log") as observer:
+    solver.solve(max_iterations=100, observer=observer)
 ```

@@ -43,7 +43,7 @@ Node types must satisfy the `Node` protocol: `__hash__` + `__lt__`.
 - `delta_add_node(node)` — O(1)
 - `delta_remove_node(node)` — O(degree)
 
-**Thread-safe variant:** `ThreadSafeGraph[NodeT]` wraps `Graph` with `RLock` for concurrent access.
+**Thread-safe variant:** `ThreadSafeGraph[NodeT]` wraps `Graph` with `RLock` for concurrent access. All public methods (including reads like `subgraph`, `node_list`, `degree_sequence`, `is_subgraph_of`) acquire the lock.
 
 ### `delta_search/problem.py`
 
@@ -235,8 +235,7 @@ if u == v:
 
 `ThreadSafeGraph` provides thread-safe access via `RLock`:
 
-- All methods acquire the lock before accessing internal state
-- `subgraph()` acquires the lock for the duration of the operation
+- All public methods acquire the lock before accessing internal state
 - No deadlocks possible (single lock, no nested locking)
 
 For single-threaded use, prefer `Graph` directly for better performance.
@@ -253,5 +252,8 @@ For single-threaded use, prefer `Graph` directly for better performance.
 | Neighbors | O(1) | O(1) + lock |
 | Degree | O(1) | O(1) + lock |
 | Subgraph | O(V+E) | O(V+E) + lock |
+| Node list | O(V) | O(V) + lock |
+| Degree sequence | O(V) | O(V) + lock |
+| Is subgraph of | O(V+E) | O(V+E) + lock |
 
 Where `d` = degree of node, `V` = vertices, `E` = edges.
