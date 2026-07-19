@@ -274,6 +274,7 @@ class StreamingObserver:
         """Initialize timing.  Call before solve()."""
         self._start_time = time.monotonic()
         if self._log_file is not None:
+            self.close()  # ponytail: guard against double-start
             self._log_handle = open(self._log_file, "w")  # noqa: SIM115
 
     def _write(self, msg: str) -> None:
@@ -293,6 +294,15 @@ class StreamingObserver:
         if self._log_handle is not None:
             self._log_handle.close()
             self._log_handle = None
+
+    def __enter__(self) -> StreamingObserver:
+        """Context manager entry."""
+        self.start()
+        return self
+
+    def __exit__(self, *args: object) -> None:
+        """Context manager exit — close log handle."""
+        self.close()
 
     def __del__(self) -> None:
         """Ensure log file handle is closed on garbage collection."""
