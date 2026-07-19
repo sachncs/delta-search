@@ -98,6 +98,7 @@ class AnytimeSolver(Generic[NodeT]):
         problem: A concrete SubgraphExtractionProblem instance.
         early_stop: Optional termination conditions.
         snapshot_interval: Record a snapshot every N iterations (default: 1).
+        max_history: Cap on number of snapshots kept (None = unlimited).
 
     """
 
@@ -106,6 +107,7 @@ class AnytimeSolver(Generic[NodeT]):
         problem: SubgraphExtractionProblem[NodeT],
         early_stop: EarlyTerminationCondition[NodeT] | None = None,
         snapshot_interval: int = 1,
+        max_history: int | None = None,
     ) -> None:
         """Initialize the anytime solver.
 
@@ -113,11 +115,13 @@ class AnytimeSolver(Generic[NodeT]):
             problem: A concrete SubgraphExtractionProblem instance.
             early_stop: Optional termination conditions.
             snapshot_interval: Record a snapshot every N iterations (default: 1).
+            max_history: Cap on number of snapshots kept (None = unlimited).
 
         """
         self.problem = problem
         self.early_stop = early_stop or EarlyTerminationCondition()
         self.snapshot_interval = max(1, snapshot_interval)
+        self.max_history = max_history
 
     def solve(
         self,
@@ -225,6 +229,8 @@ class AnytimeSolver(Generic[NodeT]):
                         elapsed_ms=elapsed_total,
                     )
                 )
+                if self.max_history is not None and len(progress) > self.max_history:
+                    progress.pop(0)  # ponytail: drop oldest, O(n) but fine for a cap
 
             self.problem.observer.on_iteration_complete(
                 iteration,

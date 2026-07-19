@@ -160,6 +160,7 @@ class MultiObjectiveSolver(Generic[NodeT]):
         problem: A concrete SubgraphExtractionProblem instance.
         objective_weights: Scalarization weights for combining objectives.
         early_stop: Optional termination conditions.
+        max_pareto_size: Cap on Pareto front size (None = unlimited).
 
     """
 
@@ -168,6 +169,7 @@ class MultiObjectiveSolver(Generic[NodeT]):
         problem: SubgraphExtractionProblem[NodeT],
         objective_weights: ObjectiveWeights | None = None,
         early_stop: EarlyTerminationCondition[NodeT] | None = None,
+        max_pareto_size: int | None = None,
     ) -> None:
         """Initialize the multi-objective solver.
 
@@ -175,6 +177,7 @@ class MultiObjectiveSolver(Generic[NodeT]):
             problem: A concrete SubgraphExtractionProblem instance.
             objective_weights: Scalarization weights for combining objectives.
             early_stop: Optional termination conditions.
+            max_pareto_size: Cap on Pareto front size (None = unlimited).
 
         """
         self.problem = problem
@@ -183,6 +186,7 @@ class MultiObjectiveSolver(Generic[NodeT]):
             weights=[1.0],
         )
         self.early_stop = early_stop or EarlyTerminationCondition()
+        self.max_pareto_size = max_pareto_size
 
     def _compute_objectives(
         self,
@@ -312,6 +316,12 @@ class MultiObjectiveSolver(Generic[NodeT]):
                 scalarized=scalar,
             )
             pareto_front = _update_pareto(pareto_front, point)
+            if (
+                self.max_pareto_size is not None
+                and len(pareto_front) > self.max_pareto_size
+            ):
+                pareto_front.sort(key=lambda p: p.scalarized, reverse=True)
+                del pareto_front[self.max_pareto_size :]
 
             elapsed_total = (time.monotonic() - start_time) * 1000
 
