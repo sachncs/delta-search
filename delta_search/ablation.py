@@ -104,6 +104,7 @@ class AblationStudy(Generic[NodeT]):
         graph_sizes: List of graph sizes (num nodes) to test.
         max_iterations: Iteration cap per solve.
         graph_density: Edge probability for Erdos-Renyi graphs.
+        seed: RNG seed for reproducible graph generation.
 
     """
 
@@ -114,6 +115,7 @@ class AblationStudy(Generic[NodeT]):
     graph_sizes: list[int] = field(default_factory=lambda: [100, 500, 1000])
     max_iterations: int = 100
     graph_density: float = 0.05
+    seed: int = 42
 
     def _generate_graph(self, n: int) -> Graph[int]:
         """Generate a random Erdos-Renyi graph.
@@ -128,7 +130,7 @@ class AblationStudy(Generic[NodeT]):
         """
         import random
 
-        rng = random.Random(42)
+        rng = random.Random(self.seed)
         graph: Graph[int] = Graph()
         for i in range(n):
             graph.add_node(i)
@@ -303,6 +305,7 @@ class ScalingStudy(Generic[NodeT]):
         graph_sizes: List of graph sizes to test.
         max_iterations: Iteration cap per solve.
         graph_density: Edge probability for random graphs.
+        seed: RNG seed for reproducible graph generation.
 
     """
 
@@ -313,12 +316,13 @@ class ScalingStudy(Generic[NodeT]):
     graph_sizes: list[int] = field(default_factory=lambda: [100, 500, 1000, 5000])
     max_iterations: int = 100
     graph_density: float = 0.05
+    seed: int = 42
 
     def _generate_graph(self, n: int) -> Graph[int]:
         """Generate a random Erdos-Renyi graph."""
         import random
 
-        rng = random.Random(42)
+        rng = random.Random(self.seed)
         graph: Graph[int] = Graph()
         for i in range(n):
             graph.add_node(i)
