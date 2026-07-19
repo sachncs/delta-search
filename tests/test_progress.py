@@ -61,6 +61,33 @@ class TestStreamingObserver:
         content = path.read_text()
         assert "[iter" in content
 
+    def test_context_manager(self, tmp_path: object) -> None:
+        import pathlib
+
+        path = pathlib.Path(str(tmp_path)) / "ctx.log"
+        g = Graph[int].from_edges([(1, 2), (2, 3), (3, 1)])
+        problem = PrizeCollectingVertexCoverProblem(g)
+        solver = GreedySolver(problem)
+
+        with StreamingObserver(log_file=str(path)) as observer:
+            solver.solve(max_iterations=5, observer=observer)
+
+        content = path.read_text()
+        assert "[done]" in content
+
+    def test_double_start_closes_previous(self, tmp_path: object) -> None:
+        import pathlib
+
+        path = pathlib.Path(str(tmp_path)) / "double.log"
+        observer = StreamingObserver(log_file=str(path))
+        observer.start()
+        observer.start()  # should not leak
+        g = Graph[int].from_edges([(1, 2)])
+        problem = PrizeCollectingVertexCoverProblem(g)
+        solver = GreedySolver(problem)
+        solver.solve(max_iterations=3, observer=observer)
+        assert path.read_text() != ""
+
 
 class TestCallbackObserver:
     def test_callbacks_are_called(self) -> None:

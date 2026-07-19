@@ -160,3 +160,51 @@ class TestMain:
             ]
         )
         assert result == 0
+
+    def test_solve_output_visible(self, tmp_path: Path, caplog) -> None:
+        caplog.set_level("INFO")
+        g = Graph[int].from_edges([(1, 2)])
+        graph_file = tmp_path / "graph.json"
+        save_graph(g, graph_file)
+        main(
+            [
+                "solve",
+                "--problem",
+                "mps",
+                "--graph",
+                str(graph_file),
+                "--max-iterations",
+                "3",
+            ]
+        )
+        assert "objective" in caplog.text
+
+    def test_solve_bad_graph_file(self, tmp_path: Path) -> None:
+        bad_file = tmp_path / "bad.json"
+        bad_file.write_text("not json")
+        with pytest.raises(json.JSONDecodeError):
+            main(
+                [
+                    "solve",
+                    "--problem",
+                    "mps",
+                    "--graph",
+                    str(bad_file),
+                ]
+            )
+
+    def test_solve_bad_problem_name(self, tmp_path: Path) -> None:
+        g = Graph[int].from_edges([(1, 2)])
+        graph_file = tmp_path / "graph.json"
+        save_graph(g, graph_file)
+        with pytest.raises(SystemExit) as exc_info:
+            main(
+                [
+                    "solve",
+                    "--problem",
+                    "nonexistent",
+                    "--graph",
+                    str(graph_file),
+                ]
+            )
+        assert exc_info.value.code == 2

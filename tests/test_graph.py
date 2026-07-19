@@ -469,6 +469,42 @@ class TestThreadSafeGraph:
         assert g.num_edges == 1
         assert hasattr(g, "lock")
 
+    def test_thread_safe_subgraph(self) -> None:
+        g = ThreadSafeGraph[int]()
+        for i in range(10):
+            g.add_edge(i, i + 1)
+        sub = g.subgraph([0, 1, 2, 3])
+        assert sub.num_nodes == 4
+
+    def test_thread_safe_edge_subgraph(self) -> None:
+        g = ThreadSafeGraph[int]()
+        g.add_edge(1, 2)
+        g.add_edge(2, 3)
+        sub = g.edge_subgraph([frozenset({1, 2})])
+        assert sub.num_edges == 1
+
+    def test_thread_safe_node_list(self) -> None:
+        g = ThreadSafeGraph[int]()
+        g.add_edge(1, 2)
+        nodes = g.node_list()
+        assert sorted(nodes) == [1, 2]
+
+    def test_thread_safe_degree_sequence(self) -> None:
+        g = ThreadSafeGraph[int]()
+        g.add_edge(1, 2)
+        g.add_edge(2, 3)
+        seq = g.degree_sequence()
+        assert seq == [2, 1, 1]
+
+    def test_thread_safe_is_subgraph_of(self) -> None:
+        g1 = ThreadSafeGraph[int]()
+        g1.add_edge(1, 2)
+        g2 = ThreadSafeGraph[int]()
+        g2.add_edge(1, 2)
+        g2.add_edge(2, 3)
+        assert g1.is_subgraph_of(g2)
+        assert not g2.is_subgraph_of(g1)
+
 
 # ---------------------------------------------------------------------------
 # Error paths

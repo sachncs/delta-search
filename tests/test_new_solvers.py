@@ -91,6 +91,13 @@ class TestAnytimeSolver:
         with pytest.raises(ValueError, match="positive"):
             solver.solve(max_iterations=0)
 
+    def test_max_history_caps_snapshots(self) -> None:
+        problem = self._make_problem()
+        solver = AnytimeSolver(problem, snapshot_interval=1, max_history=5)
+        result = solver.solve(max_iterations=50)
+        # Cap applies to interval snapshots; initial + final are always added
+        assert len(result.progress_history) <= 7
+
 
 class TestStreamingSolver:
     """Tests for StreamingSolver."""
@@ -182,6 +189,18 @@ class TestMultiObjective:
         with pytest.raises(ValueError, match="positive"):
             solver.solve(max_iterations=0)
 
+    def test_max_pareto_size_caps_front(self) -> None:
+        problem = self._make_problem()
+        weights = ObjectiveWeights(
+            objectives=["reward", "penalty"],
+            weights=[0.5, 0.5],
+        )
+        solver = MultiObjectiveSolver(
+            problem, objective_weights=weights, max_pareto_size=2,
+        )
+        result = solver.solve(max_iterations=100)
+        assert len(result.pareto_front) <= 2
+
 
 class TestLearnedGuidance:
     """Tests for LearnedGuidanceSolver."""
@@ -217,3 +236,11 @@ class TestLearnedGuidance:
         solver = LearnedGuidanceSolver(problem)
         with pytest.raises(ValueError, match="positive"):
             solver.solve(max_iterations=0)
+
+    def test_custom_sklearn_params(self) -> None:
+        problem = self._make_problem()
+        solver = LearnedGuidanceSolver(
+            problem, min_samples=5, n_estimators=5, max_depth=2,
+        )
+        result = solver.solve(max_iterations=100)
+        assert result["best_state"] is not None
