@@ -19,7 +19,6 @@ Usage::
 
 from __future__ import annotations
 
-import logging
 import random
 import time
 from dataclasses import dataclass, field
@@ -34,8 +33,6 @@ from .problem import (
     SubgraphState,
 )
 from .solver import EarlyTerminationCondition, GreedySolver
-
-logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     from .problem import SolverObserver

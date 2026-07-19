@@ -20,7 +20,6 @@ Usage::
 
 from __future__ import annotations
 
-import logging
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, Generic
 
@@ -37,8 +36,6 @@ from .test_time_compute import (
     TestTimeComputeResult,
     TestTimeComputeSolver,
 )
-
-logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     from .solver import EarlyTerminationCondition

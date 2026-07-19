@@ -21,14 +21,11 @@ Self-loops:
 from __future__ import annotations
 
 import copy
-import logging
 import threading
 from typing import TYPE_CHECKING, Any, Generic, Protocol, TypeVar, runtime_checkable
 
 if TYPE_CHECKING:
     from collections.abc import Iterable, Iterator, KeysView, ValuesView
-
-logger = logging.getLogger(__name__)
 
 __all__ = [
     "Node",

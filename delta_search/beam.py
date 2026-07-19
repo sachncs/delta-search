@@ -18,15 +18,12 @@ Usage::
 
 from __future__ import annotations
 
-import logging
 import time
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Generic
 
 from .graph import NodeT
 from .solver import EarlyTerminationCondition
-
-logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     from .problem import (
