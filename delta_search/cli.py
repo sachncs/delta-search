@@ -257,6 +257,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         Exit code (0 for success, 1 for error or no command).
 
     """
+    logging.basicConfig(level=logging.INFO, format="%(message)s")
     parser = build_parser()
     args = parser.parse_args(argv)
 
