@@ -1,0 +1,8 @@
+title: "delta-search"
+description: "A general-purpose heuristic framework for solving NP-hard subgraph extraction problems via Reward-Penalty optimization with O(1) incremental deltas."
+theme: minima
+logo: /assets/logo.svg
+show_downloads: false
+permalink: /:title/
+plugins:
+  - jekyll-feed
