@@ -76,6 +76,7 @@ class ReasoningNode(Generic[NodeT]):
 
 @dataclass
 class TestTimeComputeProblem(SubgraphExtractionProblem[NodeT]):
+    __test__ = False
     """ΔSearch problem for test-time compute allocation.
 
     Maximize reasoning quality under a compute budget.
@@ -338,6 +339,7 @@ class TestTimeComputeProblem(SubgraphExtractionProblem[NodeT]):
 
 @dataclass
 class TestTimeComputeResult:
+    __test__ = False
     """Result from test-time compute optimization.
 
     Attributes:
@@ -365,6 +367,7 @@ class TestTimeComputeResult:
 
 
 class TestTimeComputeSolver(Generic[NodeT]):
+    __test__ = False
     """Solver wrapper for test-time compute allocation.
 
     Args:
