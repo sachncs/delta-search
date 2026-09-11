@@ -35,7 +35,7 @@ from .utils import (
     is_connected,
     is_dominating_set,
     is_independent_set,
-    is_planary,
+    is_planar,
 )
 
 __all__ = [
@@ -268,7 +268,7 @@ class MaximumPlanarSubgraphProblem(SubgraphExtractionProblem[NodeT]):
             True if the subgraph is planar.
 
         """
-        return is_planary(extract_graph(state))
+        return is_planar(extract_graph(state))
 
     def enumerate_actions(self, state: SubgraphState[NodeT]) -> list[Action]:
         """Only edge additions are allowed (monotone).
