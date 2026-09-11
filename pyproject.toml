@@ -46,10 +46,10 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/sachncs/delta-search"
+Homepage = "https://sachncs.github.io/delta-search/"
 Repository = "https://github.com/sachncs/delta-search"
 "Bug Tracker" = "https://github.com/sachncs/delta-search/issues"
-Documentation = "https://github.com/sachncs/delta-search#readme"
+Documentation = "https://sachncs.github.io/delta-search/"
 Changelog = "https://github.com/sachncs/delta-search/blob/master/CHANGELOG.md"
 "arXiv" = "https://arxiv.org/abs/2606.13834"
 
