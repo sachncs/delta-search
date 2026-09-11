@@ -21,7 +21,7 @@ The core graph data structure with O(1) lookups.
 
 ```
 Graph[NodeT]
-├── adj: dict[NodeT, frozenset[NodeT]]
+├── adj: dict[NodeT, set[NodeT]]
 ├── edge_attrs: dict[frozenset[NodeT], dict[str, Any]]
 ├── node_attrs: dict[NodeT, dict[str, Any]]
 └── edge_count: int
