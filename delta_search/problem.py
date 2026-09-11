@@ -363,6 +363,19 @@ class SubgraphExtractionProblem(abc.ABC, Generic[NodeT]):
         action (plus any cached bookkeeping needed to update metrics).
         This is where the bulk of runtime is spent, so efficiency is key.
 
+        Additive invariant (important for solver correctness):
+
+        All built-in solvers reconstruct the objective of a candidate
+        successor state as ``current_objective + delta.reward_change -
+        delta.penalty_change``. Subclasses MUST therefore ensure that
+        ``compute_reward(next_state) - compute_penalty(next_state) ==
+        compute_reward(state) + delta.reward_change - delta.penalty_change``
+        whenever ``delta = calculate_delta(state, action)`` and
+        ``next_state = apply_action(state, action)``. Problems whose
+        reward or penalty does not decompose this way must override
+        :meth:`additive_objective_decomposes` to return ``False`` so
+        the solver falls back to the full-recompute path.
+
         Args:
             current_state: The current candidate state.
             candidate_action: The action to evaluate.
@@ -371,6 +384,21 @@ class SubgraphExtractionProblem(abc.ABC, Generic[NodeT]):
             A DeltaResult with reward_change, penalty_change, and feasible.
 
         """
+
+    def additive_objective_decomposes(self) -> bool:
+        """Whether the solver's ``current + delta`` shortcut is safe.
+
+        Override and return ``False`` for problems whose
+        ``compute_reward`` or ``compute_penalty`` is not a simple
+        additive decomposition of the objective.  When ``False``,
+        solvers fall back to computing the full objective on the
+        candidate state instead of relying on :meth:`calculate_delta`
+        arithmetic alone.
+
+        Returns:
+            ``True`` for built-in additive problems.
+        """
+        return True
 
     @abc.abstractmethod
     def compute_reward(self, state: SubgraphState[NodeT]) -> float:
