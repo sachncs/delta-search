@@ -21,6 +21,7 @@ Usage::
 from __future__ import annotations
 
 import time
+from collections import deque
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Generic
 
@@ -151,7 +152,7 @@ class AnytimeSolver(Generic[NodeT]):
             best_objective = current_objective
             best_iteration = 0
 
-            progress: list[ProgressSnapshot[NodeT]] = []
+            progress: deque[ProgressSnapshot[NodeT]] = deque(maxlen=self.max_history)
             start_time = time.monotonic()
 
         # Record initial snapshot
@@ -230,7 +231,7 @@ class AnytimeSolver(Generic[NodeT]):
                         )
                     )
                     if self.max_history is not None and len(progress) > self.max_history:
-                        progress.pop(0)  # drop oldest snapshot to honour the cap
+                        progress.popleft()  # drop oldest snapshot to honour the cap
 
                 self.problem.observer.on_iteration_complete(
                     iteration,
@@ -283,7 +284,7 @@ class AnytimeSolver(Generic[NodeT]):
                 )
             )
             if self.max_history is not None and len(progress) > self.max_history:
-                progress.pop(0)  # drop oldest snapshot to honour the cap
+                progress.popleft()  # drop oldest snapshot to honour the cap
 
             if observer:
                 observer.on_convergence(iteration + 1, best_objective)
@@ -292,7 +293,7 @@ class AnytimeSolver(Generic[NodeT]):
                 best_objective=best_objective,
                 best_state=best_state,
                 best_iteration=best_iteration,
-                progress_history=progress,
+                progress_history=list(progress),
                 total_iterations=iteration + 1 if iteration >= 0 else 0,
                 total_evaluations=total_evaluations,
                 elapsed_ms=elapsed_ms,
