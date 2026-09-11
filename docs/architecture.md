@@ -193,7 +193,13 @@ When `undo_action` is called:
 3. Notifies observers
 4. Returns the restored state
 
-This avoids catastrophic `deepcopy` operations while maintaining correctness.
+This default still pays an ``O(|V|+|E|)`` ``copy.deepcopy`` per
+``apply_action`` call to isolate the new state from the previous one.
+For solver hot paths, opt in with ``apply_action(state, action, incremental=True)``
+to share the graph reference and rely on ``undo_action`` to restore
+the pre-action graph from the stored ``UndoEntry``. This trades
+defensive isolation for throughput; only use ``incremental=True``
+inside solver loops that always unwind via ``undo_action``.
 
 ## Observer Protocol
 
