@@ -465,6 +465,22 @@ class TestObserverManagement:
         obs1.on_convergence.assert_called_once()
         obs2.on_convergence.assert_called_once()
 
+    def test_solver_solve_does_not_mutate_observer_list(self) -> None:
+        from delta_search import GreedySolver
+        from delta_search.problems import MaximumPlanarSubgraphProblem
+
+        class _O:
+            def on_action_evaluated(self, *a: object) -> None: ...
+            def on_iteration_complete(self, *a: object) -> None: ...
+            def on_convergence(self, *a: object) -> None: ...
+
+        g = Graph[int].from_edges([(1, 2), (2, 3), (3, 1)])
+        problem = MaximumPlanarSubgraphProblem(g)
+        before = list(problem.observers)
+        solver = GreedySolver(problem)
+        solver.solve(max_iterations=3, observer=_O())
+        assert list(problem.observers) == before
+
 
 # ---------------------------------------------------------------------------
 # DefaultState

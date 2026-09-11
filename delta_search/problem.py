@@ -38,11 +38,13 @@ from __future__ import annotations
 
 import abc
 import copy
+from contextlib import contextmanager
 from dataclasses import dataclass, field
 from enum import Enum, auto
 from typing import (
     Any,
     Generic,
+    Iterator,
     NamedTuple,
     Protocol,
     runtime_checkable,
@@ -61,6 +63,7 @@ __all__ = [
     "NullObserver",
     "FanoutObserver",
     "SubgraphExtractionProblem",
+    "attach_observer",
 ]
 
 
@@ -823,3 +826,34 @@ class SubgraphExtractionProblem(abc.ABC, Generic[NodeT]):
             f"nodes={self._input_graph.num_nodes}, "
             f"edges={self._input_graph.num_edges})"
         )
+
+
+@contextmanager
+def attach_observer(
+    problem: SubgraphExtractionProblem[NodeT],
+    observer: SolverObserver | None,
+) -> Iterator[None]:
+    """Attach ``observer`` for the duration of the block, then restore.
+
+    Preserves the prior observer list so transient solvers do not mutate
+    the problem's observer configuration across calls. The helper is a
+    public utility so every solver can wrap its ``solve`` body and
+    guarantee observer-list hygiene.
+
+    Args:
+        problem: Problem whose observers to manage.
+        observer: Observer to attach for the block, or ``None``.
+
+    Yields:
+        Nothing.
+
+    """
+    if observer is None:
+        yield
+        return
+    prior = problem.observers
+    problem.add_observer(observer)
+    try:
+        yield
+    finally:
+        problem._observers = prior
