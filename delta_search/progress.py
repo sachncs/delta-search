@@ -165,6 +165,16 @@ class TqdmObserver:
         """Close the progress bar."""
         if self._pbar is not None:
             self._pbar.close()
+            self._pbar = None
+
+    def __enter__(self) -> TqdmObserver:
+        """Context manager entry: starts the progress bar."""
+        self.start()
+        return self
+
+    def __exit__(self, *args: object) -> None:
+        """Context manager exit: closes the progress bar."""
+        self.close()
 
 
 class StreamingObserver:
