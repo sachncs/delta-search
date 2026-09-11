@@ -287,17 +287,18 @@ class ConnectivityTracker(Generic[NodeT]):
                 self._uf.union(node, nb)
 
     def remove(self, node: NodeT) -> None:
-        """Remove a node (invalidates connectivity — use with care).
+        """Remove a node and rebuild connectivity from scratch.
 
-        After removal, you should rebuild the tracker for accurate
-        connectivity checks. This is a convenience for the undo path.
+        Cost: ``O(|V| + |E|)`` per call because the Union-Find is
+        rebuilt for correctness. The tracker is therefore *not*
+        appropriate for incremental undo paths; it is intended for
+        batch removal workloads where rebuild cost is acceptable.
 
         Args:
             node: The node to remove.
 
         """
         self._nodes.discard(node)
-        # Rebuild from scratch for correctness
         old_nodes = list(self._nodes)
         self._uf = UnionFind()
         self._nodes = set()
