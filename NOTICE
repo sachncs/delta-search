@@ -1,0 +1,14 @@
+ΔSearch — Algorithm Attribution
+
+This software is an independent Python implementation of the algorithm
+described in the paper:
+
+    "Solving Subgraph Extraction Problems Using ΔSearch"
+    by Rebin Silva Valan Arasu and Rajiv Gupta, UC Riverside
+    arXiv:2606.13834
+
+The implementation in this repository is by Sachin
+(https://github.com/sachncs, sachncs@gmail.com) and is released under
+the MIT License (see LICENSE).  The paper above is the source of the
+underlying algorithmic idea; please cite it if you use this software
+in research that builds on the published work.
