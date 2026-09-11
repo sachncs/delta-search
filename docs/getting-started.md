@@ -72,13 +72,16 @@ State objects must satisfy the `SubgraphState` protocol — they need a `graph` 
 
 ```python
 from dataclasses import dataclass, field
+from typing import Any
 from delta_search import Graph, SubgraphState
+from delta_search.problem import UndoEntry
 
 @dataclass
 class MaxEdgesState:
     """State tracking the current subgraph and its properties."""
     graph: Graph[int]
-    undo: tuple | None = None
+    undo: UndoEntry | None = None
+    metrics: dict[str, Any] = field(default_factory=dict)
 ```
 
 Or use the built-in `DefaultState`:
