@@ -19,7 +19,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
-from .config import configure_logging, default_seed
+from .config import configure_logging
 from .io import load_graph
 from .solver import EarlyTerminationCondition, GreedySolver
 

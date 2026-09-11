@@ -42,13 +42,16 @@ from contextlib import contextmanager
 from dataclasses import dataclass, field
 from enum import Enum, auto
 from typing import (
+    TYPE_CHECKING,
     Any,
     Generic,
-    Iterator,
     NamedTuple,
     Protocol,
     runtime_checkable,
 )
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
 
 from .graph import Graph, NodeT
 
