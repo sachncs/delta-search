@@ -230,7 +230,7 @@ class AnytimeSolver(Generic[NodeT]):
                     )
                 )
                 if self.max_history is not None and len(progress) > self.max_history:
-                    progress.pop(0)  # ponytail: drop oldest, O(n) but fine for a cap
+                    progress.pop(0)  # drop oldest snapshot to honour the cap
 
             self.problem.observer.on_iteration_complete(
                 iteration,
@@ -283,7 +283,7 @@ class AnytimeSolver(Generic[NodeT]):
             )
         )
         if self.max_history is not None and len(progress) > self.max_history:
-            progress.pop(0)  # ponytail: drop oldest
+            progress.pop(0)  # drop oldest snapshot to honour the cap
 
         if observer:
             observer.on_convergence(iteration + 1, best_objective)

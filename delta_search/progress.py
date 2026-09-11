@@ -274,8 +274,8 @@ class StreamingObserver:
         """Initialize timing.  Call before solve()."""
         self._start_time = time.monotonic()
         if self._log_file is not None:
-            self.close()  # ponytail: guard against double-start
-            self._log_handle = open(self._log_file, "w")  # noqa: SIM115
+            self.close()  # close any prior handle before opening a new log file
+            self._log_handle = open(self._log_file, "w", encoding="utf-8")  # noqa: SIM115
 
     def _write(self, msg: str) -> None:
         """Write message to output stream and optional log file.
