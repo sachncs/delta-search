@@ -9,6 +9,54 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `attach_observer` context manager so solvers do not mutate the
+  problem's observer list across calls
+- `FanoutObserver` so multiple observers attached via `add_observer`
+  all receive `on_iteration_complete` / `on_action_evaluated` /
+  `on_convergence` events
+- `apply_action(state, action, incremental=True)` opt-in to skip the
+  default deepcopy and rely on the existing `undo_action` rollback
+- `configure_logging()` and `default_seed()` honour
+  `DELTA_SEARCH_LOG_LEVEL` and `DELTA_SEARCH_SEED` env vars
+- `LearnedGuidanceSolver(..., random_state=...)` exposes the seed and
+  logs a warning when sklearn is missing
+- `requirements.txt` / `requirements-dev.txt` for resolver reproducibility
+- `CODEOWNERS` for `/delta_search/`, `/tests/`, `/.github/workflows/`
+- TqdmObserver gained `__enter__` / `__exit__` so its lifecycle matches
+  StreamingObserver
+- `__test__ = False` on `TestTimeCompute*` classes to silence pytest
+  collection warnings
+- `social-preview.png` asset in `.github/assets/` (upload via repo
+  settings to apply)
+
+### Changed
+
+- `actions/setup-python` bumped from v6 to v7 so Python 3.14 builds
+- `Graph.subgraph` rewritten to take advantage of set-membership to
+  drop the per-node inner intersection from O(V'^2) to O(V' + E')
+- `MWST` problem picks the BFS source from `min(terminals)` for
+  hash-seed determinism
+- `learned.py` uses an instance-level RNG seeded from `random_state`
+- The library no longer mutates the root logger; CLI honours
+  `--verbose` to enable DEBUG
+
+### Fixed
+
+- Removed `__del__` IO cleanup from `StreamingObserver` (unsafe at
+  interpreter shutdown)
+- All `open()` calls now pass `encoding="utf-8"`
+- Replaced misleading PyPI badge (no release published) with install
+  badge; cut v0.1.0 tag and release to unblock downstream
+- Renamed `is_planary` to `is_planar` (correct spelling) and kept
+  `is_planary` as a deprecated alias for backward compatibility
+- `apply_action` docstring now spells out the deepcopy cost; opt-in
+  `incremental=True` skips it
+- LICENSE preamble reduced to standard MIT text; attribution moved to
+  a new NOTICE file so GitHub correctly classifies the license as MIT
+- Many docs URL / typo fixes (architecture, faq, getting-started)
+- `Graph.save_graph` no longer mutates `node_attrs` of the source
+  graph during serialization
+
 - Context engineering module for RAG context selection under token budgets
 - Test-time compute module for reasoning tree expansion under compute budgets
 - Multi-objective optimization with Pareto frontier tracking
