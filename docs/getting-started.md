@@ -10,7 +10,7 @@ This guide walks you through the basics of using ΔSearch to solve subgraph extr
 ## Installation
 
 ```bash
-git clone https://github.com/delta-search/delta-search.git
+git clone https://github.com/sachncs/delta-search.git
 cd delta-search
 pip install -e ".[dev]"
 ```
