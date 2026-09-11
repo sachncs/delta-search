@@ -283,6 +283,8 @@ class TestTimeComputeProblem(SubgraphExtractionProblem[NodeT]):
         self,
         state: SubgraphState[NodeT],
         action: Action,
+        *,
+        incremental: bool = False,
     ) -> SubgraphState[NodeT]:
         """Apply expand/prune to state."""
         import copy

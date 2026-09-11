@@ -312,6 +312,8 @@ class ContextEngineeringProblem(SubgraphExtractionProblem[NodeT]):
         self,
         state: SubgraphState[NodeT],
         action: Action,
+        *,
+        incremental: bool = False,
     ) -> SubgraphState[NodeT]:
         """Apply add/remove to state."""
         import copy

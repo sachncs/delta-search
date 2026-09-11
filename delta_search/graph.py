@@ -317,7 +317,8 @@ class Graph(Generic[NodeT]):
             it = iter(key)
             u = next(it)
             v = next(it)
-            ordered.append((u, v) if u <= v else (v, u))
+            a, b = (u, v) if u < v else (v, u)
+            ordered.append((a, b))
         ordered.sort()
         return ordered
 

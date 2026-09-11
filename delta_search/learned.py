@@ -25,12 +25,12 @@ from typing import TYPE_CHECKING, Any, Generic
 
 from .config import default_seed
 from .graph import NodeT
-from .problem import attach_observer
 from .problem import (
     Action,
     ActionType,
     SubgraphExtractionProblem,
     SubgraphState,
+    attach_observer,
 )
 from .solver import EarlyTerminationCondition
 
