@@ -96,7 +96,7 @@ def _generate_random_initial_state(
     sub = Graph[NodeT]()
     for n in selected_nodes:
         sub.add_node(n)
-    for u, v in graph.edges:
+    for u, v in graph.sorted_edges():
         if u in selected_nodes and v in selected_nodes:
             sub.add_edge(u, v)
 

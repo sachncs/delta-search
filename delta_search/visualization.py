@@ -229,7 +229,7 @@ def export_solution_graph(
         nodes_data.append(node_entry)
 
     edges_data: list[dict[str, Any]] = []
-    for u, v in solution_graph.edges:
+    for u, v in solution_graph.sorted_edges():
         edge_entry: dict[str, Any] = {"source": u, "target": v}
         attrs = dict(solution_graph.edge_data(u, v))
         if attrs:
@@ -269,5 +269,5 @@ def solution_summary(
         "num_nodes": solution_graph.num_nodes,
         "num_edges": solution_graph.num_edges,
         "nodes": list(solution_graph.nodes),
-        "edges": [{"source": u, "target": v} for u, v in solution_graph.edges],
+        "edges": [{"source": u, "target": v} for u, v in solution_graph.sorted_edges()],
     }

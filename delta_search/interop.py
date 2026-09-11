@@ -103,7 +103,7 @@ def to_networkx(graph: Graph[Any]) -> Any:
         attrs = dict(graph.node_data(node))
         nx_graph.add_node(node, **attrs)
 
-    for u, v in graph.edges:
+    for u, v in graph.sorted_edges():
         attrs = dict(graph.edge_data(u, v))
         nx_graph.add_edge(u, v, **attrs)
 

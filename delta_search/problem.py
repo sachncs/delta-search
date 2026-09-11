@@ -567,11 +567,11 @@ class SubgraphExtractionProblem(abc.ABC, Generic[NodeT]):
                         seen_edges.add(ekey)
 
         for ekey in current_edges:
-            u, v = tuple(ekey)
+            u, v = sorted(ekey)
             actions.append(Action(ActionType.REMOVE_EDGE, (u, v)))
 
         actions.extend(self.generate_composite_actions(state))
-
+        actions.sort(key=lambda a: (a.action_type.name, tuple(map(str, a.targets))))
         return actions
 
     def generate_composite_actions(

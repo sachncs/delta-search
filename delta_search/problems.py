@@ -687,7 +687,7 @@ class PrizeCollectingVertexCoverProblem(SubgraphExtractionProblem[NodeT]):
         for n in cover:
             cost += self.vertex_costs.get(n, 1.0)
         uncovered = 0.0
-        for u, v in self._input_graph.edges:
+        for u, v in self._input_graph.sorted_edges():
             if u not in cover and v not in cover:
                 uncovered += self.penalty_for(u, v)
         return -(cost + uncovered)
@@ -1074,7 +1074,7 @@ class MinimumWeightedSteinerTreeProblem(SubgraphExtractionProblem[NodeT]):
         """
         g = extract_graph(state)
         total = 0.0
-        for u, v in g.edges:
+        for u, v in g.sorted_edges():
             total += self.weight_of(u, v)
         return -total
 
@@ -1140,8 +1140,8 @@ class MinimumWeightedSteinerTreeProblem(SubgraphExtractionProblem[NodeT]):
 
         actions.extend(edge_add_actions(self._input_graph, g))
 
-        for ekey in current_edges:
-            u, v = tuple(ekey)
+        for ekey in sorted(current_edges, key=lambda k: tuple(sorted(k))):
+            u, v = sorted(ekey)
             actions.append(Action(ActionType.REMOVE_EDGE, (u, v)))
 
         return actions
