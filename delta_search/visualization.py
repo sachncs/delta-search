@@ -182,7 +182,10 @@ def plot_multi_start_distribution(
         labels = [f"Problem {i}" for i in range(len(all_objectives))]
 
     fig, ax = plt.subplots(figsize=figsize)
-    bp = ax.boxplot(all_objectives, labels=labels, patch_artist=True)
+    try:
+        bp = ax.boxplot(all_objectives, tick_labels=labels, patch_artist=True)
+    except TypeError:
+        bp = ax.boxplot(all_objectives, labels=labels, patch_artist=True)
 
     colors = plt.cm.Set2(range(len(all_objectives)))
     for patch, color in zip(bp["boxes"], colors, strict=True):
