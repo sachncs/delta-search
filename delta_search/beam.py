@@ -23,6 +23,7 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Generic
 
 from .graph import NodeT
+from .problem import attach_observer
 from .solver import EarlyTerminationCondition
 
 if TYPE_CHECKING:
@@ -128,133 +129,131 @@ class BeamSearchSolver(Generic[NodeT]):
         if max_iterations <= 0:
             raise ValueError(f"max_iterations must be positive, got {max_iterations}")
 
-        if observer:
-            self.problem.set_observer(observer)
-
+        with attach_observer(self.problem, observer):
         # Initialize beam with the initial state
-        initial_state = self.problem.evaluate_initial_state(self.problem.graph)
-        initial_obj = self.problem.objective(initial_state)
-        beam: list[_BeamCandidate[NodeT]] = [
-            _BeamCandidate(state=initial_state, objective=initial_obj),
-        ]
+            initial_state = self.problem.evaluate_initial_state(self.problem.graph)
+            initial_obj = self.problem.objective(initial_state)
+            beam: list[_BeamCandidate[NodeT]] = [
+                _BeamCandidate(state=initial_state, objective=initial_obj),
+            ]
 
-        best_objective = initial_obj
-        best_state: SubgraphState[NodeT] | None = initial_state
-        best_beam_index = 0
-        total_evaluations = 0
-        stall_count = 0
-        start_time = time.monotonic()
+            best_objective = initial_obj
+            best_state: SubgraphState[NodeT] | None = initial_state
+            best_beam_index = 0
+            total_evaluations = 0
+            stall_count = 0
+            start_time = time.monotonic()
 
-        limit = (
-            self.early_stop.max_iterations
-            if self.early_stop.max_iterations is not None
-            else max_iterations
-        )
+            limit = (
+                self.early_stop.max_iterations
+                if self.early_stop.max_iterations is not None
+                else max_iterations
+            )
 
-        converged = False
-        convergence_reason = ""
+            converged = False
+            convergence_reason = ""
 
-        for iteration in range(limit):
-            successors: list[_BeamCandidate[NodeT]] = []
+            for iteration in range(limit):
+                successors: list[_BeamCandidate[NodeT]] = []
 
-            for beam_idx, candidate in enumerate(beam):
-                actions = self.problem.enumerate_actions(candidate.state)
-                for action in actions:
-                    delta = self.problem.calculate_delta(candidate.state, action)
-                    if not delta.feasible:
-                        continue
+                for beam_idx, candidate in enumerate(beam):
+                    actions = self.problem.enumerate_actions(candidate.state)
+                    for action in actions:
+                        delta = self.problem.calculate_delta(candidate.state, action)
+                        if not delta.feasible:
+                            continue
 
-                    obj = (
-                        candidate.objective + delta.reward_change - delta.penalty_change
-                    )
-                    total_evaluations += 1
+                        obj = (
+                            candidate.objective + delta.reward_change - delta.penalty_change
+                        )
+                        total_evaluations += 1
 
                     # Create successor state
-                    new_state = self.problem.apply_action(
-                        candidate.state,
-                        action,
-                    )
-                    successors.append(
-                        _BeamCandidate(state=new_state, objective=obj),
-                    )
+                        new_state = self.problem.apply_action(
+                            candidate.state,
+                            action,
+                        )
+                        successors.append(
+                            _BeamCandidate(state=new_state, objective=obj),
+                        )
 
-                    if obj > best_objective:
-                        best_objective = obj
-                        best_state = new_state
-                        best_beam_index = beam_idx
+                        if obj > best_objective:
+                            best_objective = obj
+                            best_state = new_state
+                            best_beam_index = beam_idx
 
-            if not successors:
-                converged = True
-                convergence_reason = "no feasible successors"
-                break
+                if not successors:
+                    converged = True
+                    convergence_reason = "no feasible successors"
+                    break
 
             # Retain top-K successors
-            successors.sort(key=lambda c: c.objective, reverse=True)
-            new_beam = successors[: self.beam_width]
+                successors.sort(key=lambda c: c.objective, reverse=True)
+                new_beam = successors[: self.beam_width]
 
             # Check for improvement
-            new_best = max(c.objective for c in new_beam)
-            if new_best <= best_objective:
-                stall_count += 1
-            else:
-                stall_count = 0
+                new_best = max(c.objective for c in new_beam)
+                if new_best <= best_objective:
+                    stall_count += 1
+                else:
+                    stall_count = 0
 
-            beam = new_beam
+                beam = new_beam
 
-            elapsed = (time.monotonic() - start_time) * 1000
-            if observer:
-                best_in_beam = max(beam, key=lambda c: c.objective)
-                observer.on_iteration_complete(
-                    iteration,
-                    None,
-                    best_in_beam.objective,
-                )
+                elapsed = (time.monotonic() - start_time) * 1000
+                if observer:
+                    best_in_beam = max(beam, key=lambda c: c.objective)
+                    observer.on_iteration_complete(
+                        iteration,
+                        None,
+                        best_in_beam.objective,
+                    )
 
             # Check termination
-            if (
-                self.early_stop.max_time_ms is not None
-                and elapsed >= self.early_stop.max_time_ms
-            ):
-                converged = True
-                convergence_reason = "time limit"
-                break
-            if (
-                self.early_stop.stall_iterations is not None
-                and stall_count >= self.early_stop.stall_iterations
-            ):
-                converged = True
-                convergence_reason = (
-                    f"stalled for {self.early_stop.stall_iterations} iterations"
-                )
-                break
-            if (
-                self.early_stop.max_evaluations is not None
-                and total_evaluations >= self.early_stop.max_evaluations
-            ):
-                converged = True
-                convergence_reason = "evaluation limit"
-                break
-            if (
-                self.early_stop.objective_target is not None
-                and best_objective >= self.early_stop.objective_target
-            ):
-                converged = True
-                convergence_reason = "objective target reached"
-                break
+                if (
+                    self.early_stop.max_time_ms is not None
+                    and elapsed >= self.early_stop.max_time_ms
+                ):
+                    converged = True
+                    convergence_reason = "time limit"
+                    break
+                if (
+                    self.early_stop.stall_iterations is not None
+                    and stall_count >= self.early_stop.stall_iterations
+                ):
+                    converged = True
+                    convergence_reason = (
+                        f"stalled for {self.early_stop.stall_iterations} iterations"
+                    )
+                    break
+                if (
+                    self.early_stop.max_evaluations is not None
+                    and total_evaluations >= self.early_stop.max_evaluations
+                ):
+                    converged = True
+                    convergence_reason = "evaluation limit"
+                    break
+                if (
+                    self.early_stop.objective_target is not None
+                    and best_objective >= self.early_stop.objective_target
+                ):
+                    converged = True
+                    convergence_reason = "objective target reached"
+                    break
 
-        elapsed_ms = (time.monotonic() - start_time) * 1000
+            elapsed_ms = (time.monotonic() - start_time) * 1000
 
-        if observer:
-            observer.on_convergence(iteration + 1, best_objective)
+            if observer:
+                observer.on_convergence(iteration + 1, best_objective)
 
-        return BeamSearchResult(
-            best_objective=best_objective,
-            best_state=best_state,
-            best_beam_index=best_beam_index,
-            beam_objectives=[c.objective for c in beam],
-            total_iterations=iteration + 1 if not converged or iteration > 0 else 0,
-            total_evaluations=total_evaluations,
-            elapsed_ms=elapsed_ms,
-            converged=converged,
-            convergence_reason=convergence_reason,
-        )
+            return BeamSearchResult(
+                best_objective=best_objective,
+                best_state=best_state,
+                best_beam_index=best_beam_index,
+                beam_objectives=[c.objective for c in beam],
+                total_iterations=iteration + 1 if not converged or iteration > 0 else 0,
+                total_evaluations=total_evaluations,
+                elapsed_ms=elapsed_ms,
+                converged=converged,
+                convergence_reason=convergence_reason,
+            )

@@ -23,6 +23,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Generic
 
 from .graph import NodeT
+from .problem import attach_observer
 
 if TYPE_CHECKING:
     from .problem import (
@@ -157,73 +158,70 @@ class GreedySolver(Generic[NodeT]):
         if max_iterations <= 0:
             raise ValueError(f"max_iterations must be positive, got {max_iterations}")
 
-        if observer:
-            self._problem.set_observer(observer)
+        with attach_observer(self._problem, observer):
+            state = self._problem.evaluate_initial_state(self._problem.graph)
+            best_state = state
+            best_objective = self._problem.objective(state)
 
-        state = self._problem.evaluate_initial_state(self._problem.graph)
-        best_state = state
-        best_objective = self._problem.objective(state)
-
-        solver_state = SolverState[NodeT](
-            best_objective=best_objective,
-            best_state=best_state,
-        )
-
-        limit = (
-            self._early_stop.max_iterations
-            if self._early_stop.max_iterations is not None
-            else max_iterations
-        )
-        stall_count = 0
-        start_time = time.monotonic()
-
-        for iteration in range(limit):
-            self._problem.on_iteration_start(state, iteration)
-
-            best_action, best_action_obj, evaluated = self.evaluate_actions(
-                state,
-                best_objective,
-                start_time,
+            solver_state = SolverState[NodeT](
+                best_objective=best_objective,
+                best_state=best_state,
             )
-            solver_state.total_evaluations += evaluated
 
-            if best_action is None:
-                solver_state.converged = True
-                solver_state.convergence_reason = "no actions available"
-                break
-
-            state = self.apply_best(state, best_action)
-
-            elapsed_total = (time.monotonic() - start_time) * 1000
-            solver_state.iteration = iteration + 1
-            solver_state.elapsed_ms = elapsed_total
-
-            if best_action_obj > best_objective:
-                best_objective = best_action_obj
-                best_state = state
-                solver_state.best_objective = best_objective
-                solver_state.best_state = best_state
-                stall_count = 0
-            else:
-                stall_count += 1
-
-            self._problem.observer.on_iteration_complete(
-                iteration,
-                best_action,
-                best_action_obj,
+            limit = (
+                self._early_stop.max_iterations
+                if self._early_stop.max_iterations is not None
+                else max_iterations
             )
-            self._problem.on_iteration_end(state, iteration)
+            stall_count = 0
+            start_time = time.monotonic()
 
-            if self.check_termination(solver_state, stall_count):
-                break
+            for iteration in range(limit):
+                self._problem.on_iteration_start(state, iteration)
 
-        solver_state.elapsed_ms = (time.monotonic() - start_time) * 1000
-        self._problem.observer.on_convergence(
-            solver_state.iteration,
-            solver_state.best_objective,
-        )
+                best_action, best_action_obj, evaluated = self.evaluate_actions(
+                    state,
+                    best_objective,
+                    start_time,
+                )
+                solver_state.total_evaluations += evaluated
 
-        return solver_state
+                if best_action is None:
+                    solver_state.converged = True
+                    solver_state.convergence_reason = "no actions available"
+                    break
+
+                state = self.apply_best(state, best_action)
+
+                elapsed_total = (time.monotonic() - start_time) * 1000
+                solver_state.iteration = iteration + 1
+                solver_state.elapsed_ms = elapsed_total
+
+                if best_action_obj > best_objective:
+                    best_objective = best_action_obj
+                    best_state = state
+                    solver_state.best_objective = best_objective
+                    solver_state.best_state = best_state
+                    stall_count = 0
+                else:
+                    stall_count += 1
+
+                self._problem.observer.on_iteration_complete(
+                    iteration,
+                    best_action,
+                    best_action_obj,
+                )
+                self._problem.on_iteration_end(state, iteration)
+
+                if self.check_termination(solver_state, stall_count):
+                    break
+
+            solver_state.elapsed_ms = (time.monotonic() - start_time) * 1000
+            self._problem.observer.on_convergence(
+                solver_state.iteration,
+                solver_state.best_objective,
+            )
+            return solver_state
 
     def evaluate_actions(
         self,
