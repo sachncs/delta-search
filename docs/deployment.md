@@ -164,7 +164,7 @@ print(f"Total evaluations: {observer.evaluations}")
 |-------|----------|
 | `RecursionError` on large graphs | Increase `sys.setrecursionlimit()` or use iterative approaches |
 | Slow performance | Ensure you're using `calculate_delta` (incremental) not full re-evaluation |
-| Type errors with `mypy --strict` | Use `DefaultState[NodeT]` instead of `SubgraphState` directly |
+| `mypy --strict` errors against the library | Ensure the `py.typed` marker is shipped (it is) and run `mypy` with the same config as the project (`pyproject.toml:85-95`) |
 | `ImportError` for optional deps | Install with `pip install delta-search[all]` |
 
 ### Debug Mode
