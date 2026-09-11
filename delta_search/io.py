@@ -44,7 +44,7 @@ def save_graph(graph: Graph[NodeT], path: str | Path) -> None:
     nodes: list[dict[str, Any]] = []
     for node in graph:
         entry: dict[str, Any] = {"id": node}
-        attrs = dict(graph.node_data(node))
+        attrs = dict(graph.node_attrs.get(node, {}))
         if attrs:
             entry.update(attrs)
         nodes.append(entry)
@@ -52,7 +52,7 @@ def save_graph(graph: Graph[NodeT], path: str | Path) -> None:
     edges: list[dict[str, Any]] = []
     for u, v in graph.edges:
         entry = {"source": u, "target": v}
-        attrs = dict(graph.edge_data(u, v))
+        attrs = dict(graph.edge_attrs.get(frozenset((u, v)), {}))
         if attrs:
             entry.update(attrs)
         edges.append(entry)
