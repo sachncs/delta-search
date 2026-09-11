@@ -148,3 +148,46 @@ class TestSaveLoadGraph:
         bad_file.write_text('{"edges": ["not a dict"]}')
         with pytest.raises(ValueError, match="must be a dict"):
             load_graph(bad_file)
+
+
+class TestIoNonIntNodes:
+    @pytest.mark.parametrize(
+        "labels",
+        [
+            ("alpha", "beta", "gamma"),
+            ("hello", "world", "foo", "bar"),
+            ("x", "y", "z", "w", "v"),
+        ],
+    )
+    def test_string_node_roundtrip(self, labels: tuple[str, ...], tmp_path: Path) -> None:
+        g = Graph[str]()
+        for i in range(len(labels) - 1):
+            g.add_edge(labels[i], labels[i + 1])
+        path = tmp_path / "str_graph.json"
+        save_graph(g, path)
+        g2 = load_graph(path)
+        assert g.num_nodes == g2.num_nodes
+        assert g.num_edges == g2.num_edges
+        assert g == g2
+
+    def test_string_roundtrip_byte_stable(self, tmp_path: Path) -> None:
+        g = Graph[str]()
+        edges = [("hello", "world"), ("foo", "bar"), ("alpha", "beta")]
+        for u, v in edges:
+            g.add_edge(u, v)
+        path = tmp_path / "stable.json"
+        save_graph(g, path)
+        first = path.read_bytes()
+        for _ in range(5):
+            path.unlink()
+            save_graph(g, path)
+            assert path.read_bytes() == first
+
+    def test_tuple_node_roundtrip_skip(self) -> None:
+        # Tuples serialize as JSON arrays -> lists on load which are
+        # unhashable. The library supports tuple-keyed graphs in
+        # memory but JSON I/O requires a tuple codec; document the
+        # constraint via this skipped test.
+        import pytest
+
+        pytest.skip("Tuples do not roundtrip through JSON as keys")
