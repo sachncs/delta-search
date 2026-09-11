@@ -1024,8 +1024,9 @@ class MinimumWeightedSteinerTreeProblem(SubgraphExtractionProblem[NodeT]):
             if len(terminal_nodes) <= 1:
                 still_connected = True
             else:
-                # BFS from one terminal, avoiding the removed edge
-                start = next(iter(terminal_nodes))
+                # BFS from a canonical terminal (``min``) for deterministic
+                # ordering regardless of hash-seed.
+                start = min(terminal_nodes)
                 visited: set[NodeT] = {start}
                 queue: list[NodeT] = [start]
                 removed_key = frozenset((u, v))
@@ -1107,7 +1108,7 @@ class MinimumWeightedSteinerTreeProblem(SubgraphExtractionProblem[NodeT]):
         terminal_nodes = self.terminals & set(g.nodes)
         if len(terminal_nodes) <= 1:
             return True
-        start = next(iter(terminal_nodes))
+        start = min(terminal_nodes)
         reachable = bfs_reachable(g, {start})
         return terminal_nodes <= reachable
 
