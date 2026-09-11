@@ -17,11 +17,13 @@ Usage::
 
 from __future__ import annotations
 
+import logging
 import random
 import time
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Generic
 
+from .config import default_seed
 from .graph import NodeT
 from .problem import (
     Action,
@@ -33,6 +35,8 @@ from .solver import EarlyTerminationCondition
 
 if TYPE_CHECKING:
     from .problem import SolverObserver
+
+logger = logging.getLogger(__name__)
 
 __all__ = [
     "ActionFeatures",
@@ -119,15 +123,20 @@ def _train_model(
     n_estimators: int = 10,
     max_depth: int = 3,
     learning_rate: float = 0.1,
+    random_state: int | None = None,
 ) -> Any:
     """Train a lightweight gradient boosting model.
 
     Args:
         training_data: List of (features, target) pairs.
+        n_estimators: Number of boosting stages.
+        max_depth: Maximum tree depth.
+        learning_rate: Boosting learning rate.
+        random_state: Seed forwarded to sklearn.  When ``None`` the
+            default of ``42`` is used for backward compatibility.
 
     Returns:
-        Trained model, or None if sklearn is not available.
-
+        Trained model, or ``None`` if sklearn is not available.
     """
     if not training_data:
         return None
@@ -135,9 +144,12 @@ def _train_model(
     try:
         from sklearn.ensemble import GradientBoostingRegressor
     except ImportError:
+        logger.warning(
+            "sklearn not available; LearnedGuidanceSolver will fall back to greedy "
+            "selection until sklearn is installed."
+        )
         return None
 
-    # Convert dict features to sorted numerical lists
     features_list = [[d[0].get(k, 0.0) for k in sorted(d[0])] for d in training_data]
     targets = [d[1] for d in training_data]
 
@@ -145,7 +157,7 @@ def _train_model(
         n_estimators=n_estimators,
         max_depth=max_depth,
         learning_rate=learning_rate,
-        random_state=42,
+        random_state=random_state if random_state is not None else 42,
     )
     model.fit(features_list, targets)
     return model
@@ -170,6 +182,9 @@ class LearnedGuidanceSolver(Generic[NodeT]):
         n_estimators: Number of boosting stages for gradient boosting.
         max_depth: Maximum depth of individual regression estimators.
         learning_rate: Learning rate shrinks the contribution of each tree.
+        random_state: Seed for both the exploration RNG and the sklearn
+            model.  Defaults to the value of the ``DELTA_SEARCH_SEED``
+            env var or ``42``.
 
     """
 
@@ -183,6 +198,7 @@ class LearnedGuidanceSolver(Generic[NodeT]):
         n_estimators: int = 10,
         max_depth: int = 3,
         learning_rate: float = 0.1,
+        random_state: int | None = None,
     ) -> None:
         """Initialize the learned guidance solver.
 
@@ -195,6 +211,9 @@ class LearnedGuidanceSolver(Generic[NodeT]):
             n_estimators: Number of boosting stages for gradient boosting.
             max_depth: Maximum depth of individual regression estimators.
             learning_rate: Learning rate shrinks the contribution of each tree.
+            random_state: Seed forwarded to both the exploration RNG and
+                the sklearn model.  If ``None``, the value comes from
+                ``DELTA_SEARCH_SEED`` or ``42``.
 
         """
         self.problem = problem
@@ -205,8 +224,12 @@ class LearnedGuidanceSolver(Generic[NodeT]):
         self.n_estimators = n_estimators
         self.max_depth = max_depth
         self.learning_rate = learning_rate
+        self.random_state = random_state if random_state is not None else (
+            default_seed() if default_seed() is not None else 42
+        )
         self._training_data: list[tuple[dict[str, float], float]] = []
         self._model: Any = None
+        self._rng = random.Random(self.random_state)
 
     def solve(
         self,
@@ -259,7 +282,7 @@ class LearnedGuidanceSolver(Generic[NodeT]):
                 break
 
             # Score actions
-            if self._model is not None and random.random() >= self.exploration_rate:
+            if self._model is not None and self._rng.random() >= self.exploration_rate:
                 scored = self._score_actions(
                     state,
                     actions,
@@ -301,7 +324,7 @@ class LearnedGuidanceSolver(Generic[NodeT]):
             improvement = best_action_obj - current_objective
             self._training_data.append((features, improvement))
 
-            # Retrain model periodically
+# Retrain model periodically
             if (
                 iteration % self.train_every == 0
                 and len(self._training_data) >= self.min_samples
@@ -311,6 +334,7 @@ class LearnedGuidanceSolver(Generic[NodeT]):
                     n_estimators=self.n_estimators,
                     max_depth=self.max_depth,
                     learning_rate=self.learning_rate,
+                    random_state=self.random_state,
                 )
                 model_trained = self._model is not None
 
