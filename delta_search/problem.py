@@ -491,29 +491,47 @@ class SubgraphExtractionProblem(abc.ABC, Generic[NodeT]):
         self,
         state: SubgraphState[NodeT],
         action: Action,
+        *,
+        incremental: bool = False,
     ) -> SubgraphState[NodeT]:
         """Return a new state with action applied.
 
-        Uses a copy-graph pattern: the state is shallow-copied and
-        the graph inside it is deep-copied, so mutations do not affect
-        the original.  Enough information is stored to reverse the
-        action via ``undo_action``.
+        Default uses a copy-graph pattern: the state is shallow-copied and
+        the graph inside it is deep-copied (``copy.deepcopy`` via
+        ``Graph.from_copy``), so mutations do not affect the original.
+        Enough information is stored to reverse the action via
+        ``undo_action``.
+
+        Performance: the default copy-of-graph cost is ``O(|V|+|E|)`` per
+        call. For beam-shaped solvers that call ``apply_action`` for many
+        actions per iteration, pass ``incremental=True`` to skip the
+        deepcopy. With ``incremental=True`` the new state's graph *aliases*
+        the previous one; subsequent ``undo_action`` will restore the
+        pre-action graph via the stored ``UndoEntry`` instead of a copy.
 
         Override if your State has a more efficient structural update.
 
         Args:
             state: The current candidate state.
             action: The action to apply.
+            incremental: If True, share the graph reference and rely on
+                ``undo_action`` to roll back via ``UndoEntry``. Use this
+                only inside solver loops that always call ``undo_action``
+                before branching.
 
         Returns:
             A new state with the action applied.
 
         """
         new_state = copy.copy(state)
-        original_graph: Graph[NodeT] = self.state_graph(state)
-        graph_copy: Graph[NodeT] = Graph.from_copy(original_graph)
-        self.set_state_graph(new_state, graph_copy)
-        graph = graph_copy
+        if incremental:
+            graph = self.state_graph(state)
+            self.set_state_graph(new_state, graph)
+        else:
+            original_graph: Graph[NodeT] = self.state_graph(state)
+            graph_copy: Graph[NodeT] = Graph.from_copy(original_graph)
+            self.set_state_graph(new_state, graph_copy)
+            graph = graph_copy
 
         undo: UndoEntry | None = None
 

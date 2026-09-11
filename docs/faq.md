@@ -116,7 +116,7 @@ result = solver.solve()
 
 ΔSearch is optimized for the subgraph extraction use case:
 - O(1) incremental deltas vs. O(V+E) full evaluation
-- Undo-stack avoids deepcopy overhead
+- Undo-stack restores prior state without re-evaluation (see ``apply_action(incremental=True)``); default ``apply_action`` still copies the graph for safety.
 - Protocol-based design for minimal overhead
 
 NetworkX is more general-purpose and has a larger feature set.
