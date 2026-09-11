@@ -19,10 +19,11 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
+from .config import configure_logging, default_seed
 from .io import load_graph
 from .solver import EarlyTerminationCondition, GreedySolver
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("delta_search.cli")
 
 __all__ = [
     "import_problem",
@@ -257,7 +258,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         Exit code (0 for success, 1 for error or no command).
 
     """
-    logging.basicConfig(level=logging.INFO, format="%(message)s")
+    if "--verbose" in (argv or sys.argv[1:]):
+        configure_logging(level="DEBUG")
+    else:
+        configure_logging()
     parser = build_parser()
     args = parser.parse_args(argv)
 

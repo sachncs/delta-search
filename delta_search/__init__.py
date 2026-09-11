@@ -60,6 +60,7 @@ from .ablation import AblationStudy, ScalingStudy
 from .adaptive_beam import AdaptiveBeamSolver
 from .anytime import AnytimeResult, AnytimeSolver
 from .beam import BeamSearchResult, BeamSearchSolver
+from .config import configure_logging, default_seed
 from .budget_metrics import BudgetAwareEvaluator, BudgetMetric
 from .context_engineering import ContextEngineeringSolver
 from .graph import Graph, ThreadSafeGraph
@@ -95,6 +96,8 @@ from .theory import SubmodularAnalyzer
 __all__ = [
     "Graph",
     "ThreadSafeGraph",
+    "configure_logging",
+    "default_seed",
     "Action",
     "ActionType",
     "DeltaResult",
