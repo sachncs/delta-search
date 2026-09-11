@@ -304,10 +304,6 @@ class StreamingObserver:
         """Context manager exit — close log handle."""
         self.close()
 
-    def __del__(self) -> None:
-        """Ensure log file handle is closed on garbage collection."""
-        self.close()
-
 
 class CallbackObserver:
     """Observer that calls user-provided callbacks for each event.
