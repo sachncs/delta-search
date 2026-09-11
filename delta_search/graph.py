@@ -291,8 +291,35 @@ class Graph(Generic[NodeT]):
 
     @property
     def edges(self) -> KeysView[frozenset[NodeT]]:
-        """All edge keys.  Returns a view (no copy, O(1))."""
+        """All edge keys.  Returns a view (no copy, O(1)).
+
+        .. note::
+           Iteration order of ``edges`` follows ``edge_attrs.keys()``,
+           which depends on ``frozenset`` hashing. For deterministic
+           ordering across ``PYTHONHASHSEED``, use
+           :meth:`sorted_edges` instead.
+        """
         return self.edge_attrs.keys()
+
+    def sorted_edges(self) -> list[tuple[NodeT, NodeT]]:
+        """Return edges as a sorted list of ``(u, v)`` tuples.
+
+        Each edge's endpoints are emitted in canonical order
+        (``u <= v`` by ``Node.__lt__``). Sorting eliminates the
+        hash-dependent iteration order of ``edge_attrs.keys()`` so
+        output is reproducible across ``PYTHONHASHSEED``.
+
+        Returns:
+            Sorted list of ``(u, v)`` endpoint tuples.
+        """
+        ordered: list[tuple[NodeT, NodeT]] = []
+        for key in self.edge_attrs:
+            it = iter(key)
+            u = next(it)
+            v = next(it)
+            ordered.append((u, v) if u <= v else (v, u))
+        ordered.sort()
+        return ordered
 
     @property
     def edge_values(self) -> ValuesView[dict[str, Any]]:
@@ -401,8 +428,17 @@ class Graph(Generic[NodeT]):
 
         """
         sub: Graph[NodeT] = Graph()
+        seen: set[frozenset[NodeT]] = set()
+        ordered: list[frozenset[NodeT]] = []
         for key in edge_keys:
-            u, v = tuple(key)
+            if key in seen:
+                continue
+            seen.add(key)
+            ordered.append(key)
+        ordered.sort(key=lambda k: tuple(sorted(k)))
+        for key in ordered:
+            nodes = sorted(key)
+            u, v = nodes[0], nodes[1]
             sub.add_node(u, **self.node_attrs.get(u, {}))
             sub.add_node(v, **self.node_attrs.get(v, {}))
             data = self.edge_attrs.get(key, {})

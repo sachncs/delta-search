@@ -50,7 +50,7 @@ def save_graph(graph: Graph[NodeT], path: str | Path) -> None:
         nodes.append(entry)
 
     edges: list[dict[str, Any]] = []
-    for u, v in graph.edges:
+    for u, v in graph.sorted_edges():
         entry = {"source": u, "target": v}
         attrs = dict(graph.edge_attrs.get(frozenset((u, v)), {}))
         if attrs:
