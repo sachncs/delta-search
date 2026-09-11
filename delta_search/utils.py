@@ -4,7 +4,7 @@ Provides oracles used by concrete problem implementations:
 
 - ``is_connected``: BFS connectivity check.
 - ``connected_components``: BFS component enumeration.
-- ``is_planary``: DFS-based planarity heuristic.
+- ``is_planar``: Euler-formula planarity heuristic.
 - ``is_dominating_set``: domination check.
 - ``is_independent_set``: independence check.
 - ``vertex_cover_cost``: cost computation.
@@ -13,6 +13,7 @@ Provides oracles used by concrete problem implementations:
 
 from __future__ import annotations
 
+import warnings
 from collections import deque
 from typing import TYPE_CHECKING
 
@@ -23,7 +24,7 @@ __all__ = [
     "bfs_reachable",
     "is_connected",
     "connected_components",
-    "is_planary",
+    "is_planar",
     "is_dominating_set",
     "is_independent_set",
     "vertex_cover_cost",
@@ -123,7 +124,7 @@ def connected_components(graph: Graph[NodeT]) -> list[set[NodeT]]:
     return components
 
 
-def is_planary(graph: Graph[NodeT]) -> bool:
+def is_planar(graph: Graph[NodeT]) -> bool:
     """Heuristic planarity check using Euler's formula.
 
     A connected planar graph satisfies ``|E| <= 3|V| - 6``.
@@ -148,6 +149,26 @@ def is_planary(graph: Graph[NodeT]) -> bool:
         if num_v >= 3 and num_e > 3 * num_v - 6:
             return False
     return True
+
+
+def is_planary(graph: Graph[NodeT]) -> bool:
+    """Deprecated alias for :func:`is_planar`.
+
+    Retained for backward compatibility; new code should use ``is_planar``.
+
+    Args:
+        graph: The graph to test.
+
+    Returns:
+        True if the graph satisfies the planarity necessary condition.
+
+    """
+    warnings.warn(
+        "is_planary is deprecated; use is_planar instead.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
+    return is_planar(graph)
 
 
 def is_dominating_set(

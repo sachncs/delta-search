@@ -9,6 +9,7 @@ from delta_search.utils import (
     is_connected,
     is_dominating_set,
     is_independent_set,
+    is_planar,
     is_planary,
     vertex_cover_cost,
 )
@@ -57,17 +58,24 @@ class TestConnectedComponents:
         assert len(comps) == 3
 
 
-class TestIsPlanary:
+class TestIsPlanar:
     def test_empty_graph(self) -> None:
-        assert is_planary(Graph[int]())
+        assert is_planar(Graph[int]())
 
     def test_single_edge(self) -> None:
         g = Graph[int].from_edges([(1, 2)])
-        assert is_planary(g)
+        assert is_planar(g)
+
+    def test_planary_alias_warns(self) -> None:
+        import warnings
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            assert is_planary(Graph[int]())
+        assert any(issubclass(w.category, DeprecationWarning) for w in caught)
 
     def test_triangle(self) -> None:
         g = Graph[int].from_edges([(1, 2), (2, 3), (3, 1)])
-        assert is_planary(g)
+        assert is_planar(g)
 
     def test_complete_k5(self) -> None:
         g = Graph[int].from_edges(
@@ -84,15 +92,15 @@ class TestIsPlanary:
                 (4, 5),
             ]
         )
-        assert not is_planary(g)
+        assert not is_planar(g)
 
     def test_tree(self) -> None:
         g = Graph[int].from_edges([(1, 2), (1, 3), (1, 4)])
-        assert is_planary(g)
+        assert is_planar(g)
 
     def test_two_nodes(self) -> None:
         g = Graph[int](nodes=[1, 2])
-        assert is_planary(g)
+        assert is_planar(g)
 
 
 class TestIsDominatingSet:
@@ -226,15 +234,15 @@ class TestPlanarityEdgeCases:
         g = Graph[int]()
         g.add_edge(1, 2)
         g.add_edge(3, 4)
-        assert is_planary(g)
+        assert is_planar(g)
 
     def test_empty_graph(self) -> None:
         g = Graph[int]()
-        assert is_planary(g)
+        assert is_planar(g)
 
     def test_single_edge(self) -> None:
         g = Graph[int].from_edges([(1, 2)])
-        assert is_planary(g)
+        assert is_planar(g)
 
 
 # ---------------------------------------------------------------------------
