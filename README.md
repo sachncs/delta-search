@@ -5,7 +5,7 @@
     <a href="#installation"><img src="https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13-blue" alt="Python"></a>
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="License"></a>
     <a href="https://github.com/sachncs/delta-search/actions"><img src="https://img.shields.io/github/actions/workflow/status/sachncs/delta-search/ci.yml?branch=master" alt="CI"></a>
-    <a href="https://pypi.org/project/delta-search/"><img src="https://img.shields.io/pypi/v/delta-search" alt="PyPI"></a>
+    <a href="#installation"><img src="https://img.shields.io/badge/install-pip%20install%20git%2Bhttps%3A%2F%2Fgithub.com%2Fsachncs%2Fdelta-search-blue" alt="Install"></a>
     <a href="https://github.com/sachncs/delta-search/stargazers"><img src="https://img.shields.io/github/stars/sachncs/delta-search" alt="Stars"></a>
   </p>
 </p>
