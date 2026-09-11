@@ -27,7 +27,7 @@ Reward-Penalty optimization.
 - **Observer protocol** — hook into solver lifecycle for logging, metrics, and tracing
 - **Zero dependencies** — pure Python standard library; optional NetworkX interop
 - **Fully typed** — `mypy --strict` compliant with `py.typed` marker
-- **Production-ready** — 320+ tests, CI/CD, security scanning, 80%+ coverage
+- **CI green** — test suite, security scanning (`pip-audit`), lint (`ruff`), typecheck (`mypy --strict`), 80%+ coverage
 
 ---
 
