@@ -360,7 +360,9 @@ class Graph(Generic[NodeT]):
         """Induced subgraph on nodes.
 
         Returns a new ``Graph`` containing only the specified nodes and
-        all edges between them.  O(V' + E') where V' = len(nodes).
+        all edges between them.  Cost is ``O(V' + E')`` where
+        ``V' = |nodes|`` and ``E'`` is the number of edges fully
+        inside ``nodes``.
 
         Args:
             nodes: The node set to include.
@@ -377,8 +379,10 @@ class Graph(Generic[NodeT]):
                 sub.add_node(n, **self.node_attrs.get(n, {}))
 
         for u in node_set:
-            for v in self.adj.get(u, set()) & node_set:
-                if u < v:
+            if u not in self.adj:
+                continue
+            for v in self.adj[u]:
+                if v in node_set and u < v:
                     data = self.edge_attrs.get(frozenset((u, v)), {})
                     sub.add_edge(u, v, **data)
 
