@@ -318,11 +318,14 @@ class TestSolverObserver:
         obs.on_convergence(0, 0.0)
 
     def test_set_observer(self) -> None:
+        from delta_search.problem import FanoutObserver
+
         g = Graph[int]()
         problem = SimpleProblem(g)
         obs = MagicMock(spec=SolverObserver)
         problem.set_observer(obs)
-        assert problem.observer is obs
+        assert isinstance(problem.observer, FanoutObserver)
+        assert obs in problem.observer.observers
 
     def test_protocol_check(self) -> None:
         obs = NullObserver()
@@ -443,6 +446,24 @@ class TestObserverManagement:
         problem.add_observer(obs1)
         problem.add_observer(obs2)
         assert len(problem.observers) == 3
+
+    def test_observer_property_fans_out(self) -> None:
+        from delta_search.problem import FanoutObserver
+
+        g = Graph[int]()
+        problem = SimpleProblem(g)
+        obs1 = MagicMock(spec=SolverObserver)
+        obs2 = MagicMock(spec=SolverObserver)
+        problem.add_observer(obs1)
+        problem.add_observer(obs2)
+        fanout = problem.observer
+        assert isinstance(fanout, FanoutObserver)
+        fanout.on_iteration_complete(0, None, 0.0)
+        obs1.on_iteration_complete.assert_called_once()
+        obs2.on_iteration_complete.assert_called_once()
+        fanout.on_convergence(1, 1.0)
+        obs1.on_convergence.assert_called_once()
+        obs2.on_convergence.assert_called_once()
 
 
 # ---------------------------------------------------------------------------
