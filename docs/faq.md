@@ -150,7 +150,7 @@ Always use `apply_action` and `undo_action` to manage state.
 
 ### How do I report a bug?
 
-Open a [bug report](https://github.com/delta-search/delta-search/issues/new?template=bug_report.md) with:
+Open a [bug report](https://github.com/sachncs/delta-search/issues/new?template=bug_report.md) with:
 - Description of the problem
 - Steps to reproduce
 - Expected vs. actual behavior
@@ -158,7 +158,7 @@ Open a [bug report](https://github.com/delta-search/delta-search/issues/new?temp
 
 ### How do I request a feature?
 
-Open a [feature request](https://github.com/delta-search/delta-search/issues/new?template=feature_request.md) with:
+Open a [feature request](https://github.com/sachncs/delta-search/issues/new?template=feature_request.md) with:
 - Problem statement
 - Proposed solution
 - Use case
