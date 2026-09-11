@@ -2,11 +2,6 @@ MIT License
 
 Copyright (c) 2026 Sachin (https://github.com/sachncs, sachncs@gmail.com)
 
-This software is an independent implementation of the ΔSearch framework.
-The underlying algorithm is from the paper:
-"Solving Subgraph Extraction Problems Using ΔSearch"
-by Rebin Silva Valan Arasu and Rajiv Gupta, UC Riverside (arXiv:2606.13834).
-
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
 in the Software without restriction, including without limitation the rights
@@ -24,3 +19,5 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+For attribution regarding the underlying algorithm, see NOTICE.
