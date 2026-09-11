@@ -59,6 +59,7 @@ __all__ = [
     "UndoEntry",
     "SolverObserver",
     "NullObserver",
+    "FanoutObserver",
     "SubgraphExtractionProblem",
 ]
 
@@ -247,6 +248,74 @@ class NullObserver:
         """
 
 
+class FanoutObserver:
+    """Composite observer that fans events out to multiple child observers.
+
+    Solvers address a single observer via ``problem.observer``. When the
+    user attaches multiple observers via ``problem.add_observer`` this
+    composite is returned, ensuring every registered observer receives
+    every lifecycle event.
+
+    Args:
+        observers: Child observers to invoke on each event.
+
+    """
+
+    def __init__(self, observers: list[SolverObserver]) -> None:
+        """Initialize the fan-out observer.
+
+        Args:
+            observers: Child observers to invoke on each event.
+        """
+        self._observers: list[SolverObserver] = list(observers)
+
+    def add(self, observer: SolverObserver) -> None:
+        """Register a child observer.
+
+        Args:
+            observer: The observer to add.
+        """
+        self._observers.append(observer)
+
+    def remove(self, observer: SolverObserver) -> None:
+        """Unregister a child observer.
+
+        Args:
+            observer: The observer to remove.
+        """
+        self._observers = [o for o in self._observers if o is not observer]
+
+    @property
+    def observers(self) -> list[SolverObserver]:
+        """Read-only list of child observers."""
+        return list(self._observers)
+
+    def on_action_evaluated(
+        self,
+        action: Action,
+        delta: DeltaResult,
+        elapsed_ms: float,
+    ) -> None:
+        """Dispatch to every child observer."""
+        for obs in self._observers:
+            obs.on_action_evaluated(action, delta, elapsed_ms)
+
+    def on_iteration_complete(
+        self,
+        iteration: int,
+        best_action: Action | None,
+        objective: float,
+    ) -> None:
+        """Dispatch to every child observer."""
+        for obs in self._observers:
+            obs.on_iteration_complete(iteration, best_action, objective)
+
+    def on_convergence(self, iterations: int, final_objective: float) -> None:
+        """Dispatch to every child observer."""
+        for obs in self._observers:
+            obs.on_convergence(iterations, final_objective)
+
+
 class SubgraphExtractionProblem(abc.ABC, Generic[NodeT]):
     """Abstract interface every delta search-compatible problem must implement.
 
@@ -290,13 +359,18 @@ class SubgraphExtractionProblem(abc.ABC, Generic[NodeT]):
 
     @property
     def observer(self) -> SolverObserver:
-        """The first attached observer (for backward compatibility).
+        """An observer that fans events to all registered observers.
+
+        Solvers address a single ``observer`` instance.  This property
+        returns a :class:`FanoutObserver` wrapping every registered
+        observer (including the default ``NullObserver``), so every
+        attached observer receives every lifecycle event.
 
         Returns:
-            The primary observer receiving lifecycle events.
-
+            A fan-out observer that dispatches each event to all
+            registered observers.
         """
-        return self._observers[0]
+        return FanoutObserver(self._observers)
 
     @property
     def observers(self) -> list[SolverObserver]:
