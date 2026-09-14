@@ -1,0 +1,841 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>DeltaSearch — Heuristic Search for NP-Hard Subgraph Extraction</title>
+    <meta
+      name="description"
+      content="DeltaSearch is a general, fast heuristic framework for NP-hard subgraph extraction via Reward–Penalty optimization. O(1) incremental deltas, six problem types, zero dependencies."
+    />
+    <meta name="theme-color" content="#0b0b0f" />
+
+    <link rel="canonical" href="https://sachncs.github.io/delta-search/" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="DeltaSearch" />
+    <meta property="og:title" content="DeltaSearch — Heuristic Search for NP-Hard Subgraph Extraction" />
+    <meta
+      property="og:description"
+      content="A general heuristic framework for subgraph extraction via Reward–Penalty optimization. O(1) incremental deltas, six problem types, zero dependencies."
+    />
+    <meta property="og:url" content="https://sachncs.github.io/delta-search/" />
+    <meta property="og:image" content="https://sachncs.github.io/delta-search/assets/og.png" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="DeltaSearch — Heuristic Search for NP-Hard Subgraph Extraction" />
+    <meta
+      name="twitter:description"
+      content="O(1) incremental deltas over Reward–Penalty optimization for six NP-hard subgraph problems. Zero dependencies, mypy strict, MIT licensed."
+    />
+    <meta name="twitter:image" content="https://sachncs.github.io/delta-search/assets/og.png" />
+
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+    <link rel="apple-touch-icon" href="assets/logo.svg" />
+
+    <link rel="stylesheet" href="css/tokens.css" />
+    <link rel="stylesheet" href="css/base.css" />
+    <link rel="stylesheet" href="css/components.css" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "DeltaSearch",
+        "alternateName": "delta-search",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "Python 3.10+",
+        "softwareVersion": "0.1.0",
+        "url": "https://sachncs.github.io/delta-search/",
+        "license": "https://github.com/sachncs/delta-search/blob/master/LICENSE",
+        "description": "A general, fast heuristic framework for solving NP-hard subgraph extraction problems via Reward-Penalty optimization with O(1) incremental deltas.",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "author": { "@type": "Organization", "name": "DeltaSearch" }
+      }
+    </script>
+  </head>
+
+  <body>
+    <!-- ============================================================ Navigation -->
+    <header class="nav" id="nav">
+      <div class="container nav__inner">
+        <a class="nav__logo" href="#top" aria-label="DeltaSearch home">
+          <img src="assets/logo.svg" alt="" width="34" height="34" />
+          <span>delta-search</span>
+        </a>
+
+        <nav aria-label="Primary">
+          <ul class="nav__links">
+            <li><a class="nav__link" href="#overview">Overview</a></li>
+            <li><a class="nav__link" href="#framework">Framework</a></li>
+            <li><a class="nav__link" href="#problems">Problems</a></li>
+            <li><a class="nav__link" href="#solvers">Solvers</a></li>
+            <li><a class="nav__link" href="#code">Code</a></li>
+          </ul>
+        </nav>
+
+        <div class="nav__cta">
+          <a
+            class="btn btn--ghost btn--sm"
+            href="https://github.com/sachncs/delta-search"
+            target="_blank"
+            rel="noopener"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 2 2 7l10 5 10-5-10-5z" />
+              <path d="m2 12 10 5 10-5" />
+              <path d="m2 17 10 5 10-5" />
+            </svg>
+            GitHub
+          </a>
+          <a class="btn btn--primary btn--sm" href="#cta">Install</a>
+        </div>
+
+        <button class="nav__burger" id="nav-burger" aria-label="Menu" aria-expanded="false" aria-controls="nav-panel">
+          <span></span>
+        </button>
+      </div>
+
+      <div class="nav__panel container" id="nav-panel">
+        <a href="#overview">Overview</a>
+        <a href="#framework">Framework</a>
+        <a href="#problems">Problems</a>
+        <a href="#solvers">Solvers</a>
+        <a href="#code">Code</a>
+        <a class="btn btn--primary" href="#cta">Install DeltaSearch</a>
+      </div>
+    </header>
+
+    <main id="top">
+      <!-- ============================================================== Hero -->
+      <section class="hero dark">
+        <div class="container hero__inner">
+          <a class="badge hero__badge reveal" href="https://arxiv.org/abs/2606.13834" target="_blank" rel="noopener">
+            <span class="badge__dot" aria-hidden="true"></span>
+            New · arXiv 2606.13834 — “Solving Subgraph Extraction Problems Using ΔSearch”
+          </a>
+
+          <h1 class="reveal" style="--d: 80ms">
+            Hard graph problems,<br />
+            solved one <em>Δ</em> at a time.
+          </h1>
+
+          <p class="hero__sub reveal" style="--d: 160ms">
+            DeltaSearch is a general heuristic framework for subgraph extraction.
+            Every candidate move is scored with an O(1) incremental delta over a
+            Reward–Penalty objective — no full re-scans, no configuration, no drama.
+          </p>
+
+          <div class="hero__ctas reveal" style="--d: 240ms">
+            <a class="btn btn--primary" href="#cta">
+              Get started&nbsp;&nbsp;·&nbsp;&nbsp;<span style="font-family: var(--font-mono); font-size: 0.86em">pip install delta-search</span>
+            </a>
+            <a class="btn btn--ghost" href="https://arxiv.org/abs/2606.13834" target="_blank" rel="noopener">
+              Read the paper
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M5 12h14" /><path d="m12 5 7 7-7 7" />
+              </svg>
+            </a>
+          </div>
+
+          <ul class="hero__trust reveal" style="--d: 320ms">
+            <li>Python 3.10+</li>
+            <li>Zero runtime dependencies</li>
+            <li>MIT licensed</li>
+            <li>mypy strict</li>
+            <li>CI green · 5 versions</li>
+          </ul>
+
+          <!-- solver console visual -->
+          <div class="console reveal" style="--d: 400ms" aria-hidden="true">
+            <div class="console__bar">
+              <div class="console__lights"><span></span><span></span><span></span></div>
+              <span class="console__title">delta-search · solve --problem mps</span>
+              <span class="console__status">converged</span>
+            </div>
+
+            <div class="console__body">
+              <div class="console__panel">
+                <div class="console__label">Maximum planar subgraph · 62 nodes</div>
+                <svg class="demo-graph" viewBox="0 0 520 330" fill="none" role="img" aria-label="Animated illustration of the search graph being constructed">
+                  <defs>
+                    <linearGradient id="gline" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0" stop-color="#8A7CFF" />
+                      <stop offset="1" stop-color="#4CC9F0" />
+                    </linearGradient>
+                  </defs>
+
+                  <g>
+                    <line class="g-edge" x1="40" y1="296" x2="106" y2="318" />
+                    <line class="g-edge stagger-2" x1="106" y1="318" x2="188" y2="322" />
+                    <line class="g-edge stagger-4" x1="188" y1="322" x2="268" y2="318" />
+                    <line class="g-edge stagger-3" x1="268" y1="318" x2="344" y2="310" />
+                    <line class="g-edge stagger-2" x1="344" y1="310" x2="424" y2="300" />
+                    <line class="g-edge stagger-4" x1="424" y1="300" x2="478" y2="240" />
+                    <line class="g-edge" x1="40" y1="296" x2="86" y2="222" />
+                    <line class="g-edge stagger-2" x1="106" y1="318" x2="86" y2="222" />
+                    <line class="g-edge--hot" x1="86" y1="222" x2="176" y2="216" />
+                    <line class="g-edge stagger-5" x1="176" y1="216" x2="258" y2="212" />
+                    <line class="g-edge--hot" x1="188" y1="322" x2="258" y2="212" />
+                    <line class="g-edge stagger-1" x1="258" y1="212" x2="338" y2="208" />
+                    <line class="g-edge--hot stagger-1" x1="268" y1="318" x2="344" y2="310" />
+                    <line class="g-edge stagger-6" x1="344" y1="310" x2="338" y2="208" />
+                    <line class="g-edge stagger-3" x1="424" y1="300" x2="338" y2="208" />
+                    <line class="g-edge stagger-7" x1="86" y1="222" x2="98" y2="108" />
+                    <line class="g-edge stagger-8" x1="176" y1="216" x2="98" y2="108" />
+                    <line class="g-edge stagger-5" x1="176" y1="216" x2="184" y2="106" />
+                    <line class="g-edge--hot stagger-2" x1="258" y1="212" x2="184" y2="106" />
+                    <line class="g-edge stagger-9" x1="258" y1="212" x2="272" y2="112" />
+                    <line class="g-edge stagger-6" x1="338" y1="208" x2="272" y2="112" />
+                    <line class="g-edge stagger-9" x1="184" y1="106" x2="272" y2="112" />
+                    <line class="g-edge stagger-10" x1="272" y1="112" x2="360" y2="128" />
+                    <line class="g-edge stagger-8" x1="360" y1="128" x2="452" y2="108" />
+                    <line class="g-edge stagger-4" x1="478" y1="240" x2="360" y2="128" />
+                  </g>
+
+                  <g>
+                    <circle class="g-node stagger-a" cx="40" cy="296" r="6" />
+                    <circle class="g-node stagger-a" cx="106" cy="318" r="6" />
+                    <circle class="g-node stagger-b" cx="188" cy="322" r="6" />
+                    <circle class="g-node stagger-b" cx="268" cy="318" r="6" />
+                    <circle class="g-node stagger-b" cx="344" cy="310" r="6" />
+                    <circle class="g-node stagger-a" cx="424" cy="300" r="6" />
+                    <circle class="g-node stagger-a" cx="478" cy="240" r="6" />
+                    <circle class="g-node stagger-c" cx="86" cy="222" r="6" />
+                    <circle class="g-node--live stagger-c" cx="176" cy="216" r="7" />
+                    <circle class="g-node stagger-d" cx="258" cy="212" r="6" />
+                    <circle class="g-node stagger-d" cx="338" cy="208" r="6" />
+                    <circle class="g-node stagger-e" cx="98" cy="108" r="6" />
+                    <circle class="g-node--live stagger-e" cx="184" cy="106" r="7" />
+                    <circle class="g-node stagger-f" cx="272" cy="112" r="6" />
+                    <circle class="g-node stagger-f" cx="360" cy="128" r="6" />
+                    <circle class="g-node stagger-g" cx="452" cy="108" r="6" />
+                  </g>
+
+                  <g class="delta-float">
+                    <path d="m173 148 12 0 0 12" stroke="url(#gline)" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round" />
+                    <circle cx="183" cy="155" r="2.5" fill="#4CC9F0" />
+                  </g>
+                </svg>
+              </div>
+
+              <div class="console__panel">
+                <div class="objective">
+                  <div class="console__label">Objective · reward − penalty</div>
+                  <div class="objective__readout">
+                    <span class="objective__value" data-count="180" data-decimals="0" data-suffix="">0</span>
+                    <span class="objective__unit">edges retained</span>
+                  </div>
+
+                  <svg class="objective__chart" viewBox="0 0 460 240" fill="none" aria-hidden="true">
+                    <defs>
+                      <linearGradient id="ofill" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0" stop-color="#8A7CFF" stop-opacity="0.35" />
+                        <stop offset="1" stop-color="#8A7CFF" stop-opacity="0" />
+                      </linearGradient>
+                      <linearGradient id="oline" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0" stop-color="#8A7CFF" />
+                        <stop offset="1" stop-color="#4CC9F0" />
+                      </linearGradient>
+                    </defs>
+                    <path
+                      class="objective__area"
+                      d="M20 210 L50 196 L80 185 L110 174 L140 160 L175 140 L210 120 L250 96 L290 72 L330 50 L370 32 L410 20 L440 16 L440 240 L20 240 Z"
+                      fill="url(#ofill)"
+                    />
+                    <path
+                      class="objective__line"
+                      d="M20 210 L50 196 L80 185 L110 174 L140 160 L175 140 L210 120 L250 96 L290 72 L330 50 L370 32 L410 20 L440 16"
+                      stroke="url(#oline)"
+                      stroke-width="3"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+
+                  <div class="objective__log">
+                    <p>eval #128 &nbsp; ADD_EDGE (v32, v47)</p>
+                    <p class="log-acc">Δ = +1.0 &nbsp; feasible ✓</p>
+                    <p>iter 129 · objective 180</p>
+                    <p class="log-ok">planar bound reached · converging</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================== Stats -->
+      <section class="section" aria-label="Key numbers">
+        <div class="container">
+          <ul class="stats reveal">
+            <li>
+              <div class="stat__value"><span class="grad" data-count="6">0</span></div>
+              <div class="stat__label">NP-hard problems</div>
+            </li>
+            <li>
+              <div class="stat__value"><span class="grad" data-count="10" data-suffix="+">0</span></div>
+              <div class="stat__label">solver strategies</div>
+            </li>
+            <li>
+              <div class="stat__value"><span class="grad" data-count="320" data-suffix="+">0</span></div>
+              <div class="stat__label">tests passing</div>
+            </li>
+            <li>
+              <div class="stat__value"><span class="grad" data-count="80" data-suffix="%">0</span></div>
+              <div class="stat__label">coverage, enforced</div>
+            </li>
+            <li>
+              <div class="stat__value"><span class="grad" data-count="0">0</span></div>
+              <div class="stat__label">runtime dependencies</div>
+            </li>
+            <li>
+              <div class="stat__value"><span class="grad">O(1)</span></div>
+              <div class="stat__label">per candidate move</div>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- ======================================================== Overview -->
+      <section class="section" id="overview">
+        <div class="container">
+          <div class="section--head reveal">
+            <span class="eyebrow">Overview</span>
+            <h2 class="h2">A single engine for six NP-hard problems</h2>
+            <p class="section--lead">
+              Subgraph extraction is everywhere — network design, facility placement,
+              coverage, routing. DeltaSearch factors the hard part into one optional
+              framework: a small, typed, dependency-free interface you apply to your
+              own problem in minutes.
+            </p>
+          </div>
+
+          <div class="grid pillars">
+            <article class="pillar reveal" style="--d: 60ms">
+              <div class="pillar__icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <rect x="3" y="3" width="7" height="9" rx="1.5" />
+                  <rect x="14" y="3" width="7" height="5" rx="1.5" />
+                  <rect x="14" y="12" width="7" height="9" rx="1.5" />
+                  <rect x="3" y="16" width="7" height="5" rx="1.5" />
+                </svg>
+              </div>
+              <h3>One framework, many problems</h3>
+              <p>
+                Maximum Planar Subgraph, Connected Dominating Set, Independent Set,
+                Prize Collecting Vertex Cover, Facility Location, Steiner Tree —
+                monotone and non-monotone alike. Same interface, six realizations.
+              </p>
+              <span class="pillar__tag">General purpose</span>
+            </article>
+
+            <article class="pillar reveal" style="--d: 140ms">
+              <div class="pillar__icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z" />
+                </svg>
+              </div>
+              <h3>Constant-time moves</h3>
+              <p>
+                Every candidate mutation is scored with an O(1) incremental delta —
+                no re-evaluation of the whole graph. An undo stack makes every step
+                reversible, so backtracking costs nothing extra.
+              </p>
+              <span class="pillar__tag">O(1) deltas · undo-stack</span>
+            </article>
+
+            <article class="pillar reveal" style="--d: 220ms">
+              <div class="pillar__icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                  <path d="m9 12 2 2 4-4" />
+                </svg>
+              </div>
+              <h3>Built like it ships</h3>
+              <p>
+                Fully typed (<code>mypy --strict</code>), thread-safe graphs, 320+ tests,
+                80%+ enforced coverage, CI green across five Python releases — and a
+                pure-standard-library runtime.
+              </p>
+              <span class="pillar__tag">Zero deps · Typed · CI green</span>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================= Framework -->
+      <section class="section section--soft" id="framework">
+        <div class="container">
+          <div class="section--head reveal">
+            <span class="eyebrow">Framework</span>
+            <h2 class="h2">Five steps from input graph to answer</h2>
+            <p class="section--lead">
+              A tiny protocol, a greedy core, and pluggable solvers. Define your own
+              problem in a handful of methods, or reach for a built-in one.
+            </p>
+          </div>
+
+          <ol class="flow">
+            <li class="flow__step reveal" style="--d: 40ms">
+              <div class="flow__num"></div>
+              <h3>Seed</h3>
+              <p>evaluate_initial_state builds a starting subgraph.</p>
+            </li>
+            <li class="flow__step reveal" style="--d: 120ms">
+              <div class="flow__num"></div>
+              <h3>Enumerate</h3>
+              <p>enumerate_actions lists candidate add/remove moves.</p>
+            </li>
+            <li class="flow__step reveal" style="--d: 200ms">
+              <div class="flow__num"></div>
+              <h3>Score</h3>
+              <p>calculate_delta returns reward − penalty in O(1).</p>
+            </li>
+            <li class="flow__step reveal" style="--d: 280ms">
+              <div class="flow__num"></div>
+              <h3>Commit · Undo</h3>
+              <p>apply_action or undo_action, always reversible.</p>
+            </li>
+            <li class="flow__step reveal" style="--d: 360ms">
+              <div class="flow__num"></div>
+              <h3>Converge</h3>
+              <p>Stop on budget, stall, or objective target.</p>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- ============================================================ Story -->
+      <section class="section dark" id="story">
+        <div class="container">
+          <div class="story-grid">
+            <div class="reveal">
+              <span class="eyebrow">In practice</span>
+              <h2 class="h2">A real run, rendered by the real library</h2>
+              <ul class="story-copy">
+                <li>
+                  The screenshot is an actual <strong>Maximum Planar Subgraph</strong>
+                  solve rendered with DeltaSearch&rsquo;s solver — no hand-drawn demo data.
+                </li>
+                <li>
+                  62 nodes · 229 candidate edges. The solver keeps adding edges while a
+                  planarity check runs incrementally on each candidate move.
+                </li>
+                <li>
+                  It lands exactly on the planar bound: <code>3V − 6 = 180</code> edges —
+                  the optimal limit for a simple planar graph.
+                </li>
+                <li>
+                  The whole run evaluates one edge at a time in constant work per move,
+                  instead of re-checking the full graph at every iteration.
+                </li>
+              </ul>
+            </div>
+
+            <div class="scr-panel reveal" style="--d: 140ms">
+              <div class="scr">
+                <div class="scr__bar" aria-hidden="true">
+                  <span>max planar subgraph · 62 nodes · 229 edges</span>
+                </div>
+                <img
+                  src="assets/screenshot-graph.png"
+                  alt="Rendered result of a Maximum Planar Subgraph solve: selected edges glow in violet and cyan over the faint input graph"
+                  width="1560"
+                  height="990"
+                  loading="lazy"
+                />
+                <div class="scr__cap">
+                  <span>✓ <code>3V − 6</code> bound reached</span>
+                  <span>·</span>
+                  <span><code>GreedySolver</code> · <code>MaximumPlanarSubgraphProblem</code></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================== Problems -->
+      <section class="section section--soft" id="problems">
+        <div class="container">
+          <div class="section--head reveal">
+            <span class="eyebrow">Built-in problems</span>
+            <h2 class="h2">The classics, covered out of the box</h2>
+            <p class="section--lead">
+              Each problem is a fleshed-out <code>SubgraphExtractionProblem</code> —
+              instantiate it on a <code>Graph</code>, hand it to a solver, done.
+            </p>
+          </div>
+
+          <div class="grid problems">
+            <article class="problem reveal" style="--d: 20ms">
+              <div class="problem__head">
+                <span class="problem__ac">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" /></svg>
+                </span>
+                <span class="problem__tag" data-kind="monotone">Monotone</span>
+              </div>
+              <div class="problem__title">
+                <h3>Maximum Planar Subgraph</h3>
+                <small>MaximumPlanarSubgraphProblem</small>
+              </div>
+              <p>Keep as many edges as possible while the subgraph stays planar.</p>
+            </article>
+
+            <article class="problem reveal" style="--d: 80ms">
+              <div class="problem__head">
+                <span class="problem__ac">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a7 7 0 0 1 7 7c0 2-1 4-3 5l1 8H7l1-8c-2-1-3-3-3-5a7 7 0 0 1 7-7z" /><path d="m9.5 12 2 2 3-4" /></svg>
+                </span>
+                <span class="problem__tag" data-kind="monotone">Monotone</span>
+              </div>
+              <div class="problem__title">
+                <h3>Minimum Connected Dominating Set</h3>
+                <small>MinimumConnectedDominatingSetProblem</small>
+              </div>
+              <p>The smallest connected vertex set that dominates the whole graph.</p>
+            </article>
+
+            <article class="problem reveal" style="--d: 140ms">
+              <div class="problem__head">
+                <span class="problem__ac">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9" /><circle cx="5.5" cy="5.5" r="1.5" fill="currentColor" stroke="none" /><circle cx="18.5" cy="7" r="1.5" fill="currentColor" stroke="none" /><circle cx="16" cy="17" r="1.5" fill="currentColor" stroke="none" /><path d="M8 17h5" /></svg>
+                </span>
+                <span class="problem__tag" data-kind="monotone">Monotone</span>
+              </div>
+              <div class="problem__title">
+                <h3>Maximum Weight Independent Set</h3>
+                <small>MaximumWeightedIndependentSetProblem</small>
+              </div>
+              <p>The heaviest set of mutually non-adjacent vertices.</p>
+            </article>
+
+            <article class="problem reveal" style="--d: 60ms">
+              <div class="problem__head">
+                <span class="problem__ac">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v18M5 8v8M19 8v8" /></svg>
+                </span>
+                <span class="problem__tag" data-kind="non-monotone">Non-monotone</span>
+              </div>
+              <div class="problem__title">
+                <h3>Prize Collecting Vertex Cover</h3>
+                <small>PrizeCollectingVertexCoverProblem</small>
+              </div>
+              <p>Balance vertex cost against uncovered-edge penalties, collecting prizes.</p>
+            </article>
+
+            <article class="problem reveal" style="--d: 140ms">
+              <div class="problem__head">
+                <span class="problem__ac">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 20h20M4 16l4-6 4 4 5-8 3 4" /></svg>
+                </span>
+                <span class="problem__tag" data-kind="non-monotone">Non-monotone</span>
+              </div>
+              <div class="problem__title">
+                <h3>Uncapacitated Facility Location</h3>
+                <small>UncapacitatedFacilityLocationProblem</small>
+              </div>
+              <p>Where to open facilities to serve demand at the lowest total cost.</p>
+            </article>
+
+            <article class="problem reveal" style="--d: 220ms">
+              <div class="problem__head">
+                <span class="problem__ac">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9" /><circle cx="5" cy="12" r="2.4" fill="currentColor" stroke="none" /><circle cx="19" cy="9" r="2.4" fill="currentColor" stroke="none" /><circle cx="14" cy="18" r="2.4" fill="currentColor" stroke="none" /><path d="M7 12h5.5M14 9h4.5M12 12l2 6" /></svg>
+                </span>
+                <span class="problem__tag" data-kind="non-monotone">Non-monotone</span>
+              </div>
+              <div class="problem__title">
+                <h3>Minimum Weighted Steiner Tree</h3>
+                <small>MinimumWeightedSteinerTreeProblem</small>
+              </div>
+              <p>Connect a set of terminals through optional nodes at minimum edge cost.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- ====================================================== Performance -->
+      <section class="section" id="performance">
+        <div class="container">
+          <div class="perf-grid">
+            <div class="reveal">
+              <span class="eyebrow">Performance</span>
+              <h2 class="h2">Fast to the answer. Easy to trust.</h2>
+
+              <div class="perf-item">
+                <span class="perf-item__icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 12 2 2 4-4" /><circle cx="12" cy="12" r="9" /></svg>
+                </span>
+                <div>
+                  <h3>Constant-time deltas</h3>
+                  <p>Each move is scored from local context via <code>calculate_delta</code>, not a full graph re-evaluation.</p>
+                </div>
+              </div>
+
+              <div class="perf-item">
+                <span class="perf-item__icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8" /><path d="M3 3v5h5" /></svg>
+                </span>
+                <div>
+                  <h3>Undo-stack rollback</h3>
+                  <p>Every mutation is logged in an undo stack. Backtracking restores prior state without re-scoring.</p>
+                </div>
+              </div>
+
+              <div class="perf-item">
+                <span class="perf-item__icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2" /><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>
+                </span>
+                <div>
+                  <h3>Thread-safe by default</h3>
+                  <p><code>ThreadSafeGraph</code> wraps every read and write in an <code>RLock</code> for safe parallel search.</p>
+                </div>
+              </div>
+
+              <div class="perf-item">
+                <span class="perf-item__icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1" /></svg>
+                </span>
+                <div>
+                  <h3>Observable convergence</h3>
+                  <p>The observer protocol exposes every action, delta, and objective — logging, metrics, and tracing for free.</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="reveal" style="--d: 140ms">
+              <div class="chart-panel">
+                <div class="chart-panel__head">
+                  <span class="chart-panel__dot" aria-hidden="true"></span>
+                  <span>objective vs iteration · real run</span>
+                </div>
+                <img
+                  src="assets/screenshot-convergence.png"
+                  alt="Convergence chart from a real solve: objective climbs monotonically to the planar bound"
+                  width="1560"
+                  height="600"
+                  loading="lazy"
+                />
+                <div class="chart-panel__cap">
+                  <span>Max Planar Subgraph</span>
+                  <span><strong>62</strong> nodes</span>
+                  <span><strong>229</strong> edges in</span>
+                  <span><strong>180</strong> edges out</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================== Solvers -->
+      <section class="section section--soft" id="solvers">
+        <div class="container">
+          <div class="section--head reveal">
+            <span class="eyebrow">Solvers</span>
+            <h2 class="h2">More than greedy</h2>
+            <p class="section--lead">
+              The greedy core is the floor, not the ceiling. Every strategy shares the
+              same problem interface, so you can upgrade the search without rewriting
+              the problem.
+            </p>
+          </div>
+
+          <div class="grid solvers">
+            <div class="solver reveal" style="--d: 10ms">
+              <code>MultiStartSolver</code>
+              <p>Many random starts; the best result wins.</p>
+            </div>
+            <div class="solver reveal" style="--d: 60ms">
+              <code>BeamSearchSolver</code>
+              <p>Top-κ candidate states explored in parallel.</p>
+            </div>
+            <div class="solver reveal" style="--d: 110ms">
+              <code>AnytimeSolver</code>
+              <p>Best-so-far progress under a time budget.</p>
+            </div>
+            <div class="solver reveal" style="--d: 160ms">
+              <code>AdaptiveBeamSolver</code>
+              <p>Diversity-aware beam ordering for better coverage.</p>
+            </div>
+            <div class="solver reveal" style="--d: 210ms">
+              <code>LearnedGuidanceSolver</code>
+              <p>Online ML steers action choice as it explores.</p>
+            </div>
+            <div class="solver reveal" style="--d: 260ms">
+              <code>MultiObjectiveSolver</code>
+              <p>Pareto-optimal frontiers across competing objectives.</p>
+            </div>
+            <div class="solver reveal" style="--d: 310ms">
+              <code>StreamingSolver</code>
+              <p>Keep solving as the graph mutates under you.</p>
+            </div>
+            <div class="solver reveal" style="--d: 360ms">
+              <code>HybridPipeline</code>
+              <p>Two-stage retrieval + reasoning, end to end.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================= Code -->
+      <section class="section dark" id="code">
+        <div class="container code">
+          <div class="section--head reveal">
+            <span class="eyebrow">API</span>
+            <h2 class="h2">Three lines to your first solve</h2>
+            <p class="section--lead">
+              Define a problem, point a solver at it, and read the result. Optional
+              observers, early-stopping, and NetworkX interop when you need them.
+            </p>
+          </div>
+
+          <div class="reveal" style="--d: 120ms">
+            <div class="code__tabs" role="tablist" aria-label="Code examples">
+              <button class="code__tab is-active" role="tab" aria-selected="true" data-tab="py">Python API</button>
+              <button class="code__tab" role="tab" aria-selected="false" data-tab="cli">CLI</button>
+            </div>
+
+            <div class="code__win">
+              <div class="code__win-bar">
+                <span class="console__lights"><span></span><span></span><span></span></span>
+                <span class="code__win-bar-title">solve.py</span>
+                <button class="code__copy" type="button">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
+                  Copy
+                </button>
+              </div>
+
+              <div class="code__pane" data-pane="py">
+<pre class="code__pre"><code><span class="tok-kw">from</span> delta_search <span class="tok-kw">import</span> <span class="tok-cls">Graph</span>, <span class="tok-cls">GreedySolver</span>, <span class="tok-cls">PrizeCollectingVertexCoverProblem</span>
+
+<span class="tok-com"># Build an input graph with O(1) adjacency lookups.</span>
+graph = <span class="tok-cls">Graph</span>[<span class="tok-vr">int</span>].from_edges(
+    [(<span class="tok-num">1</span>, <span class="tok-num">2</span>), (<span class="tok-num">2</span>, <span class="tok-num">3</span>), (<span class="tok-num">3</span>, <span class="tok-num">1</span>), (<span class="tok-num">3</span>, <span class="tok-num">4</span>),
+     (<span class="tok-num">4</span>, <span class="tok-num">5</span>), (<span class="tok-num">5</span>, <span class="tok-num">2</span>), (<span class="tok-num">1</span>, <span class="tok-num">5</span>)]
+)
+
+<span class="tok-com"># Solve: cover every edge, keep the prize, pay vertex cost.</span>
+problem = <span class="tok-cls">PrizeCollectingVertexCoverProblem</span>(graph, default_penalty=<span class="tok-num">2.0</span>)
+result = <span class="tok-cls">GreedySolver</span>(problem).solve(max_iterations=<span class="tok-num">200</span>)
+
+<span class="tok-kw">print</span>(result.best_objective)   <span class="tok-com"># 95.0 — objective found</span>
+<span class="tok-kw">print</span>(result.iteration)        <span class="tok-com"># steps taken to get there</span>
+</code></pre>
+              </div>
+
+              <div class="code__pane" data-pane="cli" hidden>
+<pre class="code__pre"><code><span class="tok-com"># Solve a graph and write the solution to JSON.</span>
+<span class="tok-prompt">$</span> delta-search solve --problem mps --graph input.json --output result.json
+
+<span class="tok-com"># Validate a graph before you solve it.</span>
+<span class="tok-prompt">$</span> delta-search validate --graph input.json
+
+<span class="tok-com"># Available problems: mps, mcds, mwis, pcvc, uflp, mwst</span>
+</code></pre>
+              </div>
+            </div>
+
+            <div class="code__foot">
+              <span>
+                More patterns — custom problems, observers, early stopping, and
+                NetworkX interop — in the
+                <a href="https://github.com/sachncs/delta-search/tree/master/docs" target="_blank" rel="noopener"><code>docs/</code></a> directory.
+              </span>
+              <span>
+                Install: <code>pip install delta-search</code>
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- =============================================================== CTA -->
+      <section class="section dark cta" id="cta">
+        <div class="container">
+          <div class="cta__card reveal">
+            <h2>Ship better <em>graphs</em>.</h2>
+            <p>
+              One pip install away from six NP-hard problems, constant-time moves,
+              and a search you can actually watch converge.
+            </p>
+            <div class="cta__actions">
+              <a class="btn btn--primary" href="https://github.com/sachncs/delta-search" target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2 2 7l10 5 10-5-10-5z" /><path d="m2 12 10 5 10-5" /><path d="m2 17 10 5 10-5" /></svg>
+                Star on GitHub
+              </a>
+              <a class="btn btn--ghost" href="https://arxiv.org/abs/2606.13834" target="_blank" rel="noopener">
+                Read the arXiv paper
+              </a>
+            </div>
+            <p class="cta__hint">pip install delta-search · Python 3.10+ · MIT</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- ============================================================= Footer -->
+    <footer class="footer">
+      <div class="container">
+        <div class="footer__grid">
+          <div class="footer__brand">
+            <a class="footer__logo" href="#top">
+              <img src="assets/logo.svg" alt="" width="32" height="32" />
+              <span>delta-search</span>
+            </a>
+            <p>
+              A general, fast heuristic framework for NP-hard subgraph extraction via
+              Reward–Penalty optimization — an independent implementation of the
+              ΔSearch algorithm.
+            </p>
+          </div>
+
+          <div class="footer__col">
+            <h4>Product</h4>
+            <ul>
+              <li><a href="#overview">Overview</a></li>
+              <li><a href="#framework">Framework</a></li>
+              <li><a href="#problems">Problems</a></li>
+              <li><a href="#solvers">Solvers</a></li>
+              <li><a href="#performance">Performance</a></li>
+            </ul>
+          </div>
+
+          <div class="footer__col">
+            <h4>Resources</h4>
+            <ul>
+              <li><a href="https://github.com/sachncs/delta-search/tree/master/docs" target="_blank" rel="noopener">Documentation</a></li>
+              <li><a href="https://arxiv.org/abs/2606.13834" target="_blank" rel="noopener">The ΔSearch paper</a></li>
+              <li><a href="https://github.com/sachncs/delta-search/blob/master/CHANGELOG.md" target="_blank" rel="noopener">Changelog</a></li>
+              <li><a href="https://github.com/sachncs/delta-search/blob/master/CONTRIBUTING.md" target="_blank" rel="noopener">Contributing</a></li>
+            </ul>
+          </div>
+
+          <div class="footer__col">
+            <h4>Project</h4>
+            <ul>
+              <li><a href="https://github.com/sachncs/delta-search" target="_blank" rel="noopener">GitHub</a></li>
+              <li><a href="https://github.com/sachncs/delta-search/issues" target="_blank" rel="noopener">Issues</a></li>
+              <li><a href="https://github.com/sachncs/delta-search/blob/master/SECURITY.md" target="_blank" rel="noopener">Security</a></li>
+              <li><a href="https://github.com/sachncs/delta-search/blob/master/LICENSE" target="_blank" rel="noopener">MIT License</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="footer__bottom">
+          <span>© 2026 Sachin · MIT License</span>
+          <span>
+            ΔSearch · arXiv:2606.13834 ·
+            <a href="#top">Back to top ↑</a>
+          </span>
+        </div>
+      </div>
+    </footer>
+
+    <script src="js/main.js" defer></script>
+  </body>
+</html>

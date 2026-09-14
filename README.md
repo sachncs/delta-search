@@ -232,9 +232,16 @@ delta-search/
 │   └── py.typed               # PEP 561 marker
 ├── tests/                     # Test suite (320+ tests)
 ├── docs/                      # Documentation
+├── site/                      # Product landing page (GitHub Pages)
+│   ├── index.html             # Landing page markup
+│   ├── css/                   # Design tokens + component styles
+│   ├── js/                    # Page interactions
+│   ├── assets/                # Brand assets, renders, social card
+│   └── scripts/               # Asset generator (real solves → images)
 ├── .github/                   # GitHub configuration
 │   ├── workflows/
 │   │   ├── ci.yml             # CI pipeline
+│   │   ├── pages.yml          # GitHub Pages deployment (site/)
 │   │   └── release.yml        # PyPI release automation
 │   └── ISSUE_TEMPLATE/
 ├── .pre-commit-config.yaml
