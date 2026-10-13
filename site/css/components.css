@@ -782,7 +782,7 @@ body.nav-open .nav__burger span::after {
   color: var(--muted);
 }
 
-/* --- story (screenshot) ----------------------------------------------------- */
+/* --- story (animated search trace) ----------------------------------------- */
 
 .story-grid {
   display: grid;
@@ -830,8 +830,9 @@ body.nav-open .nav__burger span::after {
   height: 44px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
   gap: 0.5rem;
+  padding-right: 1rem;
   z-index: 2;
   background: linear-gradient(rgba(13, 13, 18, 0.55), transparent);
 }
@@ -848,9 +849,205 @@ body.nav-open .nav__burger span::after {
   backdrop-filter: blur(8px);
 }
 
-.scr img {
+.run-animation {
+  position: relative;
+  padding: 4.75rem 1.1rem 1.1rem;
+  background: radial-gradient(circle at 68% 42%, rgba(136, 160, 255, 0.16), transparent 34%),
+    radial-gradient(circle at 24% 74%, rgba(197, 243, 108, 0.08), transparent 36%), #0d0d12;
+}
+
+.run-animation__hud {
+  position: absolute;
+  top: 0.9rem;
+  left: 1.1rem;
+  right: 1.1rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  color: #9a9baa;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.run-animation__phase {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: #c5f36c;
+}
+
+.run-animation__phase i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #c5f36c;
+  box-shadow: 0 0 0 4px rgba(197, 243, 108, 0.12);
+  animation: run-pulse 1.8s ease-in-out infinite;
+}
+
+.run-animation__metric strong {
+  color: #f5f5f7;
+  font-weight: 600;
+}
+
+.run-animation__svg {
+  display: block;
   width: 100%;
   height: auto;
+  overflow: visible;
+}
+
+.run-animation__grid path {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.055);
+  stroke-width: 1;
+}
+
+.run-animation__candidate-edges path {
+  fill: none;
+  stroke: #596174;
+  stroke-width: 1.35;
+  stroke-dasharray: 4 8;
+  opacity: 0;
+  animation: run-candidate 8s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 120ms);
+}
+
+.run-animation__solution-edges path {
+  fill: none;
+  stroke: url("#run-line");
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: run-draw 8s ease-in-out infinite;
+  animation-delay: calc(700ms + var(--i) * 220ms);
+}
+
+.run-animation__nodes circle {
+  fill: #111925;
+  stroke: #aab6dc;
+  stroke-width: 1.5;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: run-node 8s ease-in-out infinite;
+  animation-delay: calc(650ms + var(--i) * 105ms);
+}
+
+.run-animation__current,
+.run-animation__callout {
+  opacity: 0;
+  animation: run-current 8s ease-in-out infinite;
+  animation-delay: 4.25s;
+}
+
+.run-animation__current path {
+  fill: none;
+  stroke: #c5f36c;
+  stroke-width: 4;
+  stroke-linecap: round;
+}
+
+.run-animation__current circle {
+  fill: #c5f36c;
+  stroke: #0d0d12;
+  stroke-width: 3;
+}
+
+.run-animation__callout path {
+  fill: none;
+  stroke: #c5f36c;
+  stroke-width: 1.5;
+}
+
+.run-animation__callout rect {
+  fill: #121925;
+  stroke: rgba(197, 243, 108, 0.72);
+  stroke-width: 1.25;
+}
+
+.run-animation__callout text {
+  fill: #f5f5f7;
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.run-animation__callout text + text {
+  fill: #c5f36c;
+  font-size: 11px;
+}
+
+.run-animation__timeline {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 0.2rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.09);
+  color: #626879;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.run-animation__timeline .active {
+  color: #c5f36c;
+}
+
+.scr__fallback {
+  width: 100%;
+  height: auto;
+}
+
+@keyframes run-pulse {
+  0%, 100% { opacity: 0.5; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
+@keyframes run-candidate {
+  0%, 8% { opacity: 0; }
+  17%, 66% { opacity: 0.48; }
+  78%, 100% { opacity: 0.12; }
+}
+
+@keyframes run-draw {
+  0%, 10% { stroke-dashoffset: 1; opacity: 0.4; }
+  28%, 74% { stroke-dashoffset: 0; opacity: 1; }
+  100% { stroke-dashoffset: 0; opacity: 0.82; }
+}
+
+@keyframes run-node {
+  0%, 10% { opacity: 0; transform: scale(0.4); }
+  22%, 82% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0.78; transform: scale(1); }
+}
+
+@keyframes run-current {
+  0%, 52% { opacity: 0; }
+  60%, 74% { opacity: 1; }
+  84%, 100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .run-animation__phase i,
+  .run-animation__candidate-edges path,
+  .run-animation__solution-edges path,
+  .run-animation__nodes circle,
+  .run-animation__current,
+  .run-animation__callout {
+    animation: none;
+  }
+
+  .run-animation__candidate-edges path { opacity: 0.35; }
+  .run-animation__solution-edges path { opacity: 0.92; stroke-dashoffset: 0; }
+  .run-animation__nodes circle { opacity: 1; transform: scale(1); }
+  .run-animation__current,
+  .run-animation__callout { opacity: 1; }
 }
 
 .scr__cap {

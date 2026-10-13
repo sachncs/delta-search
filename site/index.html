@@ -7,7 +7,7 @@
     <title>DeltaSearch — Heuristic Search for NP-Hard Subgraph Extraction</title>
     <meta
       name="description"
-      content="DeltaSearch is a general, fast heuristic framework for NP-hard subgraph extraction via Reward–Penalty optimization. O(1) incremental deltas, six problem types, zero dependencies."
+      content="DeltaSearch is an alpha-stage Python framework for heuristic subgraph extraction. Define reward, penalty, and feasibility; inspect candidate moves and convergence locally."
     />
     <meta name="theme-color" content="#0b0b0f" />
 
@@ -18,7 +18,7 @@
     <meta property="og:title" content="DeltaSearch — Heuristic Search for NP-Hard Subgraph Extraction" />
     <meta
       property="og:description"
-      content="A general heuristic framework for subgraph extraction via Reward–Penalty optimization. O(1) incremental deltas, six problem types, zero dependencies."
+      content="An alpha-stage Python framework for subgraph extraction via Reward–Penalty optimization. Six built-in problem types, typed interfaces, and a standard-library core."
     />
     <meta property="og:url" content="https://sachncs.github.io/delta-search/" />
     <meta property="og:image" content="https://sachncs.github.io/delta-search/assets/og.png" />
@@ -27,7 +27,7 @@
     <meta name="twitter:title" content="DeltaSearch — Heuristic Search for NP-Hard Subgraph Extraction" />
     <meta
       name="twitter:description"
-      content="O(1) incremental deltas over Reward–Penalty optimization for six NP-hard subgraph problems. Zero dependencies, mypy strict, MIT licensed."
+      content="Alpha-stage heuristic search for six NP-hard subgraph problems. Local incremental deltas, typed interfaces, standard-library core, and MIT license."
     />
     <meta name="twitter:image" content="https://sachncs.github.io/delta-search/assets/og.png" />
 
@@ -49,7 +49,7 @@
         "softwareVersion": "0.1.0",
         "url": "https://sachncs.github.io/delta-search/",
         "license": "https://github.com/sachncs/delta-search/blob/master/LICENSE",
-        "description": "A general, fast heuristic framework for solving NP-hard subgraph extraction problems via Reward-Penalty optimization with O(1) incremental deltas.",
+        "description": "An alpha-stage heuristic framework for solving NP-hard subgraph extraction problems via Reward-Penalty optimization with local incremental deltas.",
         "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
         "author": { "@type": "Organization", "name": "DeltaSearch" }
       }
@@ -90,7 +90,7 @@
             </svg>
             GitHub
           </a>
-          <a class="btn btn--primary btn--sm" href="#cta">Install</a>
+          <a class="btn btn--primary btn--sm" href="docs/">Docs</a>
         </div>
 
         <button class="nav__burger" id="nav-burger" aria-label="Menu" aria-expanded="false" aria-controls="nav-panel">
@@ -105,7 +105,7 @@
         <a href="#solvers">Solvers</a>
         <a href="#code">Code</a>
         <a href="docs/">Docs</a>
-        <a class="btn btn--primary" href="#cta">Install DeltaSearch</a>
+        <a class="btn btn--primary" href="docs/getting-started.html">Start locally</a>
       </div>
     </header>
 
@@ -119,25 +119,25 @@
           </div>
 
           <h1 class="reveal" style="--d: 80ms">
-            Hard graph problems,<br />
-            solved one <em>Δ</em> at a time.
+            Better graph solutions,<br />
+            one local <em>Δ</em> at a time.
           </h1>
 
           <p class="hero__sub reveal" style="--d: 160ms">
-            DeltaSearch is an alpha-stage Python framework for subgraph extraction.
-            Every candidate move is scored with an O(1) incremental delta over a
-            Reward–Penalty objective. Clone the repo, inspect the solver, and try it locally.
+            An alpha-stage Python framework for heuristic subgraph extraction.
+            Define reward, penalty, and feasibility once; DeltaSearch handles
+            candidate moves, rollback, and search budgets.
           </p>
 
           <div class="hero__ctas reveal" style="--d: 240ms">
-            <a class="btn btn--primary" href="https://github.com/sachncs/delta-search" target="_blank" rel="noopener">
-              View the source
+            <a class="btn btn--primary" href="docs/">
+              Read the docs
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M5 12h14" /><path d="m12 5 7 7-7 7" />
               </svg>
             </a>
-            <a class="btn btn--ghost" href="#code">
-              Try the local setup
+            <a class="btn btn--ghost" href="https://github.com/sachncs/delta-search" target="_blank" rel="noopener">
+              View the source
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M5 12h14" /><path d="m12 5 7 7-7 7" />
               </svg>
@@ -146,10 +146,10 @@
 
           <ul class="hero__trust reveal" style="--d: 320ms">
             <li>Python 3.10+</li>
-            <li>Zero runtime dependencies</li>
+            <li>stdlib core</li>
             <li>MIT licensed</li>
-            <li>mypy strict</li>
-            <li>Alpha · not on PyPI yet</li>
+            <li>typed API</li>
+            <li>alpha · local install</li>
           </ul>
 
           <!-- solver console visual -->
@@ -210,7 +210,7 @@
                 <div class="objective">
                   <div class="console__label">Objective · reward − penalty</div>
                   <div class="objective__readout">
-                    <span class="objective__value" data-count="180" data-decimals="0" data-suffix="">0</span>
+                    <span class="objective__value" data-count="180" data-decimals="0" data-suffix="">180</span>
                     <span class="objective__unit">edges retained</span>
                   </div>
 
@@ -244,7 +244,7 @@
                     <p>eval #128 &nbsp; ADD_EDGE (v32, v47)</p>
                     <p class="log-acc">Δ = +1.0 &nbsp; feasible ✓</p>
                     <p>iter 129 · objective 180</p>
-                    <p class="log-ok">planar bound reached · converging</p>
+                    <p class="log-ok">Euler bound reached · inspect result</p>
                   </div>
                 </div>
               </div>
@@ -258,28 +258,28 @@
         <div class="container">
           <ul class="stats reveal">
             <li>
-              <div class="stat__value"><span class="grad" data-count="6">0</span></div>
+              <div class="stat__value"><span class="grad" data-count="6">6</span></div>
               <div class="stat__label">NP-hard problems</div>
             </li>
             <li>
-              <div class="stat__value"><span class="grad" data-count="10" data-suffix="+">0</span></div>
+              <div class="stat__value"><span class="grad" data-count="8">8</span></div>
               <div class="stat__label">solver strategies</div>
             </li>
             <li>
-              <div class="stat__value"><span class="grad" data-count="320" data-suffix="+">0</span></div>
-              <div class="stat__label">tests passing</div>
+              <div class="stat__value"><span class="grad" data-count="380" data-suffix="+">380+</span></div>
+              <div class="stat__label">tests in CI</div>
             </li>
             <li>
-              <div class="stat__value"><span class="grad" data-count="80" data-suffix="%">0</span></div>
-              <div class="stat__label">coverage, enforced</div>
+              <div class="stat__value"><span class="grad" data-count="80" data-suffix="%">80%</span></div>
+              <div class="stat__label">coverage enforced</div>
             </li>
             <li>
               <div class="stat__value"><span class="grad" data-count="0">0</span></div>
-              <div class="stat__label">runtime dependencies</div>
+              <div class="stat__label">core dependencies</div>
             </li>
             <li>
-              <div class="stat__value"><span class="grad">O(1)</span></div>
-              <div class="stat__label">per candidate move</div>
+            <div class="stat__value"><span class="grad">local</span></div>
+            <div class="stat__label">delta per move</div>
             </li>
           </ul>
         </div>
@@ -292,10 +292,9 @@
             <span class="eyebrow">Overview</span>
             <h2 class="h2">A single engine for six NP-hard problems</h2>
             <p class="section--lead">
-              Subgraph extraction is everywhere — network design, facility placement,
-              coverage, routing. DeltaSearch factors the hard part into one optional
-              framework: a small, typed, dependency-free interface you apply to your
-              own problem in minutes.
+              Turn a graph objective into a small, testable problem contract.
+              DeltaSearch owns the search loop while your code defines domain rules,
+              feasibility, and what a good move means.
             </p>
           </div>
 
@@ -324,13 +323,12 @@
                   <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z" />
                 </svg>
               </div>
-              <h3>Constant-time moves</h3>
+              <h3>Local deltas</h3>
               <p>
-                Every candidate mutation is scored with an O(1) incremental delta —
-                no re-evaluation of the whole graph. An undo stack makes every step
-                reversible, so backtracking costs nothing extra.
+                Candidate scoring stays local instead of recomputing the objective
+                from scratch. Reversible actions make the search loop inspectable.
               </p>
-              <span class="pillar__tag">O(1) deltas · undo-stack</span>
+              <span class="pillar__tag">Incremental · reversible</span>
             </article>
 
             <article class="pillar reveal" style="--d: 220ms">
@@ -340,13 +338,12 @@
                   <path d="m9 12 2 2 4-4" />
                 </svg>
               </div>
-              <h3>Built like it ships</h3>
+              <h3>Easy to inspect</h3>
               <p>
-                Fully typed (<code>mypy --strict</code>), thread-safe graphs, 320+ tests,
-                80%+ enforced coverage, CI green across five Python releases — and a
-                pure-standard-library runtime.
+                Typed interfaces, explicit budgets, observers, thread-safe graph access,
+                and a standard-library core make experiments easier to reproduce.
               </p>
-              <span class="pillar__tag">Zero deps · Typed · CI green</span>
+              <span class="pillar__tag">Typed · Observable · Alpha</span>
             </article>
           </div>
         </div>
@@ -378,7 +375,7 @@
             <li class="flow__step reveal" style="--d: 200ms">
               <div class="flow__num"></div>
               <h3>Score</h3>
-              <p>calculate_delta returns reward − penalty in O(1).</p>
+              <p>calculate_delta scores a candidate from local context.</p>
             </li>
             <li class="flow__step reveal" style="--d: 280ms">
               <div class="flow__num"></div>
@@ -400,23 +397,23 @@
           <div class="story-grid">
             <div class="reveal">
               <span class="eyebrow">In practice</span>
-              <h2 class="h2">A real run, rendered by the real library</h2>
+              <h2 class="h2">A real run, shown at readable scale</h2>
               <ul class="story-copy">
                 <li>
                   This is a real <strong>Maximum Planar Subgraph</strong>
                   solve rendered from the repository&rsquo;s demo generator — not a decorative mockup.
                 </li>
                 <li>
-                  62 nodes · 229 candidate edges. The solver keeps adding edges while a
-                  planarity check runs incrementally on each candidate move.
+                  62 nodes · 229 candidate edges. The solver keeps adding edges while
+                  an incremental Euler-bound filter screens each candidate move.
                 </li>
                 <li>
-                  It lands exactly on the planar bound: <code>3V − 6 = 180</code> edges —
-                  the optimal limit for a simple planar graph.
+                  It reaches the Euler upper bound: <code>3V − 6 = 180</code> edges.
+                  That is a useful bound for simple planar graphs, not a proof of planarity.
                 </li>
                 <li>
-                  The whole run evaluates one edge at a time in constant work per move,
-                  instead of re-checking the full graph at every iteration.
+                  Each candidate uses an incremental delta instead of recomputing the
+                  objective from scratch at every iteration.
                 </li>
               </ul>
             </div>
@@ -426,17 +423,71 @@
                 <div class="scr__bar" aria-hidden="true">
                   <span>max planar subgraph · 62 nodes · 229 edges</span>
                 </div>
-                <img
-                  src="assets/screenshot-graph.png"
-                  alt="Rendered result of a Maximum Planar Subgraph solve: selected edges highlighted over the candidate graph"
-                  width="1560"
-                  height="990"
-                  loading="lazy"
-                />
+                <div class="run-animation" aria-hidden="true">
+                  <div class="run-animation__hud">
+                    <span class="run-animation__phase"><i></i> evaluating candidates</span>
+                    <span class="run-animation__metric">objective <strong>180</strong></span>
+                  </div>
+                  <svg class="run-animation__svg" viewBox="0 0 760 430" role="img" aria-label="Animated illustrative search trace showing candidate edges being evaluated and accepted into a retained subgraph">
+                    <defs>
+                      <linearGradient id="run-line" x1="0" y1="1" x2="1" y2="0">
+                        <stop offset="0" stop-color="#88a0ff" />
+                        <stop offset="1" stop-color="#c5f36c" />
+                      </linearGradient>
+                      <filter id="run-glow" x="-30%" y="-30%" width="160%" height="160%">
+                        <feGaussianBlur stdDeviation="4" result="blur" />
+                        <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+                      </filter>
+                    </defs>
+                    <g class="run-animation__grid">
+                      <path d="M20 80H740M20 160H740M20 240H740M20 320H740M120 30V390M260 30V390M400 30V390M540 30V390M680 30V390" />
+                    </g>
+                    <g class="run-animation__candidate-edges">
+                      <path style="--i:1" d="M72 300L160 174L284 124L412 158L540 112L688 208L610 332L460 362L308 350L176 360Z" />
+                      <path style="--i:2" d="M72 300L284 124L460 362L688 208L176 360L412 158L610 332L160 174Z" />
+                      <path style="--i:3" d="M160 174L308 350L540 112L610 332L284 124L688 208L176 360L412 158Z" />
+                      <path style="--i:4" d="M72 300L412 158L610 332L284 124L176 360L540 112L460 362L688 208Z" />
+                      <path style="--i:5" d="M160 174L460 362L688 208L308 350L540 112L72 300L610 332L284 124Z" />
+                      <path style="--i:6" d="M176 360L412 158L540 112L308 350L160 174L610 332L72 300L688 208Z" />
+                    </g>
+                    <g class="run-animation__solution-edges">
+                      <path style="--i:1" d="M72 300L160 174L284 124L412 158L540 112L688 208L610 332L460 362L308 350L176 360L72 300" />
+                      <path style="--i:2" d="M160 174L308 350" />
+                      <path style="--i:3" d="M284 124L460 362" />
+                      <path style="--i:4" d="M412 158L610 332" />
+                      <path style="--i:5" d="M540 112L460 362" />
+                      <path style="--i:6" d="M688 208L308 350" />
+                      <path style="--i:7" d="M176 360L284 124" />
+                    </g>
+                    <g class="run-animation__nodes">
+                      <circle style="--i:1" cx="72" cy="300" r="6" /><circle style="--i:2" cx="160" cy="174" r="6" />
+                      <circle style="--i:3" cx="284" cy="124" r="6" /><circle style="--i:4" cx="412" cy="158" r="6" />
+                      <circle style="--i:5" cx="540" cy="112" r="6" /><circle style="--i:6" cx="688" cy="208" r="6" />
+                      <circle style="--i:7" cx="610" cy="332" r="6" /><circle style="--i:8" cx="460" cy="362" r="6" />
+                      <circle style="--i:9" cx="308" cy="350" r="6" /><circle style="--i:10" cx="176" cy="360" r="6" />
+                    </g>
+                    <g class="run-animation__current" filter="url(#run-glow)">
+                      <path d="M412 158L610 332" />
+                      <circle cx="610" cy="332" r="10" />
+                    </g>
+                    <g class="run-animation__callout">
+                      <path d="M610 332L660 282H728" />
+                      <rect x="536" y="232" width="192" height="46" rx="10" />
+                      <text x="552" y="251">candidate edge</text>
+                      <text x="552" y="268">Δ +1.0 · feasible</text>
+                    </g>
+                  </svg>
+                  <div class="run-animation__timeline">
+                    <span>candidate scan</span><span class="active">accepted move</span><span>bound reached</span>
+                  </div>
+                </div>
+                <noscript>
+                  <img class="scr__fallback" src="assets/screenshot-graph.png?v=2" alt="Representative view of a Maximum Planar Subgraph heuristic result: selected edges highlighted over candidate edges" width="1560" height="990" />
+                </noscript>
                 <div class="scr__cap">
-                  <span>✓ <code>3V − 6</code> bound reached</span>
+                  <span>✓ <code>3V − 6</code> Euler bound reached</span>
                   <span>·</span>
-                  <span><code>GreedySolver</code> · <code>MaximumPlanarSubgraphProblem</code></span>
+                  <span>representative view · <code>GreedySolver</code></span>
                 </div>
               </div>
             </div>
@@ -468,7 +519,7 @@
                 <h3>Maximum Planar Subgraph</h3>
                 <small>MaximumPlanarSubgraphProblem</small>
               </div>
-              <p>Keep as many edges as possible while the subgraph stays planar.</p>
+              <p>Keep as many edges as possible while screening candidates against an Euler-bound feasibility rule.</p>
             </article>
 
             <article class="problem reveal" style="--d: 80ms">
@@ -550,14 +601,14 @@
           <div class="perf-grid">
             <div class="reveal">
               <span class="eyebrow">Performance</span>
-              <h2 class="h2">Fast to the answer. Easy to trust.</h2>
+            <h2 class="h2">Understand the search as it runs.</h2>
 
               <div class="perf-item">
                 <span class="perf-item__icon">
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 12 2 2 4-4" /><circle cx="12" cy="12" r="9" /></svg>
                 </span>
                 <div>
-                  <h3>Constant-time deltas</h3>
+                  <h3>Local deltas</h3>
                   <p>Each move is scored from local context via <code>calculate_delta</code>, not a full graph re-evaluation.</p>
                 </div>
               </div>
@@ -577,7 +628,7 @@
                   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2" /><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>
                 </span>
                 <div>
-                  <h3>Thread-safe by default</h3>
+                  <h3>Thread-safe access</h3>
                   <p><code>ThreadSafeGraph</code> protects mutations and explicit snapshots with an <code>RLock</code>; hold the lock when coordinating live views.</p>
                 </div>
               </div>
@@ -597,11 +648,11 @@
               <div class="chart-panel">
                 <div class="chart-panel__head">
                   <span class="chart-panel__dot" aria-hidden="true"></span>
-                  <span>objective vs iteration · real run</span>
+                  <span>objective vs iteration · heuristic run</span>
                 </div>
                 <img
                   src="assets/screenshot-convergence.png"
-                  alt="Convergence chart from a real solve: objective climbs monotonically to the planar bound"
+                  alt="Convergence chart from a heuristic solve: objective climbs monotonically to the Euler edge bound"
                   width="1560"
                   height="600"
                   loading="lazy"
@@ -623,7 +674,7 @@
         <div class="container">
           <div class="section--head reveal">
             <span class="eyebrow">Solvers</span>
-            <h2 class="h2">More than greedy</h2>
+            <h2 class="h2">Choose your search strategy.</h2>
             <p class="section--lead">
               The greedy core is the floor, not the ceiling. Every strategy shares the
               same problem interface, so you can upgrade the search without rewriting
@@ -745,9 +796,9 @@ result = <span class="tok-cls">GreedySolver</span>(problem).solve(max_iterations
       <section class="section dark cta" id="cta">
         <div class="container">
           <div class="cta__card reveal">
-            <h2>Ship better <em>graphs</em>.</h2>
+            <h2>Explore better <em>graphs</em>.</h2>
             <p>
-              An alpha-stage toolkit for six NP-hard problems, constant-time moves,
+              An alpha-stage toolkit for six NP-hard problems, local deltas,
               and a search you can inspect as it converges.
             </p>
             <div class="cta__actions">
