@@ -72,6 +72,7 @@
             <li><a class="nav__link" href="#problems">Problems</a></li>
             <li><a class="nav__link" href="#solvers">Solvers</a></li>
             <li><a class="nav__link" href="#code">Code</a></li>
+            <li><a class="nav__link" href="docs/">Docs</a></li>
           </ul>
         </nav>
 
@@ -103,6 +104,7 @@
         <a href="#problems">Problems</a>
         <a href="#solvers">Solvers</a>
         <a href="#code">Code</a>
+        <a href="docs/">Docs</a>
         <a class="btn btn--primary" href="#cta">Install DeltaSearch</a>
       </div>
     </header>
@@ -111,10 +113,10 @@
       <!-- ============================================================== Hero -->
       <section class="hero dark">
         <div class="container hero__inner">
-          <a class="badge hero__badge reveal" href="https://arxiv.org/abs/2606.13834" target="_blank" rel="noopener">
+          <div class="badge hero__badge reveal">
             <span class="badge__dot" aria-hidden="true"></span>
-            New · arXiv 2606.13834 — “Solving Subgraph Extraction Problems Using ΔSearch”
-          </a>
+            Alpha release · PyPI package coming soon
+          </div>
 
           <h1 class="reveal" style="--d: 80ms">
             Hard graph problems,<br />
@@ -122,17 +124,20 @@
           </h1>
 
           <p class="hero__sub reveal" style="--d: 160ms">
-            DeltaSearch is a general heuristic framework for subgraph extraction.
+            DeltaSearch is an alpha-stage Python framework for subgraph extraction.
             Every candidate move is scored with an O(1) incremental delta over a
-            Reward–Penalty objective — no full re-scans, no configuration, no drama.
+            Reward–Penalty objective. Clone the repo, inspect the solver, and try it locally.
           </p>
 
           <div class="hero__ctas reveal" style="--d: 240ms">
-            <a class="btn btn--primary" href="#cta">
-              Get started&nbsp;&nbsp;·&nbsp;&nbsp;<span style="font-family: var(--font-mono); font-size: 0.86em">pip install delta-search</span>
+            <a class="btn btn--primary" href="https://github.com/sachncs/delta-search" target="_blank" rel="noopener">
+              View the source
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M5 12h14" /><path d="m12 5 7 7-7 7" />
+              </svg>
             </a>
-            <a class="btn btn--ghost" href="https://arxiv.org/abs/2606.13834" target="_blank" rel="noopener">
-              Read the paper
+            <a class="btn btn--ghost" href="#code">
+              Try the local setup
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M5 12h14" /><path d="m12 5 7 7-7 7" />
               </svg>
@@ -144,80 +149,61 @@
             <li>Zero runtime dependencies</li>
             <li>MIT licensed</li>
             <li>mypy strict</li>
-            <li>CI green · 5 versions</li>
+            <li>Alpha · not on PyPI yet</li>
           </ul>
 
           <!-- solver console visual -->
           <div class="console reveal" style="--d: 400ms" aria-hidden="true">
             <div class="console__bar">
               <div class="console__lights"><span></span><span></span><span></span></div>
-              <span class="console__title">delta-search · solve --problem mps</span>
-              <span class="console__status">converged</span>
+              <span class="console__title">delta-search · mps-demo</span>
+              <span class="console__status">sample result</span>
             </div>
 
             <div class="console__body">
               <div class="console__panel">
-                <div class="console__label">Maximum planar subgraph · 62 nodes</div>
-                <svg class="demo-graph" viewBox="0 0 520 330" fill="none" role="img" aria-label="Animated illustration of the search graph being constructed">
+                <div class="console__label">MAXIMUM PLANAR SUBGRAPH <span>62 nodes · 229 candidates</span></div>
+                <svg class="demo-graph" viewBox="0 0 520 330" fill="none" role="img" aria-label="Illustrative maximum planar subgraph result with selected edges and candidate edges">
                   <defs>
                     <linearGradient id="gline" x1="0" y1="0" x2="1" y2="1">
-                      <stop offset="0" stop-color="#5367E8" />
-                      <stop offset="1" stop-color="#B8F36B" />
+                      <stop offset="0" stop-color="#86A8FF" />
+                      <stop offset="1" stop-color="#C5F36C" />
                     </linearGradient>
+                    <filter id="soft-glow" x="-50%" y="-50%" width="200%" height="200%">
+                      <feGaussianBlur stdDeviation="5" result="blur" />
+                      <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+                    </filter>
                   </defs>
 
-                  <g>
-                    <line class="g-edge" x1="40" y1="296" x2="106" y2="318" />
-                    <line class="g-edge stagger-2" x1="106" y1="318" x2="188" y2="322" />
-                    <line class="g-edge stagger-4" x1="188" y1="322" x2="268" y2="318" />
-                    <line class="g-edge stagger-3" x1="268" y1="318" x2="344" y2="310" />
-                    <line class="g-edge stagger-2" x1="344" y1="310" x2="424" y2="300" />
-                    <line class="g-edge stagger-4" x1="424" y1="300" x2="478" y2="240" />
-                    <line class="g-edge" x1="40" y1="296" x2="86" y2="222" />
-                    <line class="g-edge stagger-2" x1="106" y1="318" x2="86" y2="222" />
-                    <line class="g-edge--hot" x1="86" y1="222" x2="176" y2="216" />
-                    <line class="g-edge stagger-5" x1="176" y1="216" x2="258" y2="212" />
-                    <line class="g-edge--hot" x1="188" y1="322" x2="258" y2="212" />
-                    <line class="g-edge stagger-1" x1="258" y1="212" x2="338" y2="208" />
-                    <line class="g-edge--hot stagger-1" x1="268" y1="318" x2="344" y2="310" />
-                    <line class="g-edge stagger-6" x1="344" y1="310" x2="338" y2="208" />
-                    <line class="g-edge stagger-3" x1="424" y1="300" x2="338" y2="208" />
-                    <line class="g-edge stagger-7" x1="86" y1="222" x2="98" y2="108" />
-                    <line class="g-edge stagger-8" x1="176" y1="216" x2="98" y2="108" />
-                    <line class="g-edge stagger-5" x1="176" y1="216" x2="184" y2="106" />
-                    <line class="g-edge--hot stagger-2" x1="258" y1="212" x2="184" y2="106" />
-                    <line class="g-edge stagger-9" x1="258" y1="212" x2="272" y2="112" />
-                    <line class="g-edge stagger-6" x1="338" y1="208" x2="272" y2="112" />
-                    <line class="g-edge stagger-9" x1="184" y1="106" x2="272" y2="112" />
-                    <line class="g-edge stagger-10" x1="272" y1="112" x2="360" y2="128" />
-                    <line class="g-edge stagger-8" x1="360" y1="128" x2="452" y2="108" />
-                    <line class="g-edge stagger-4" x1="478" y1="240" x2="360" y2="128" />
+                  <g class="g-candidates">
+                    <path d="M48 246 112 286 188 270 254 294 332 262 414 278 472 226" />
+                    <path d="M48 246 86 152 164 92 254 116 340 82 432 126 472 226" />
+                    <path d="M112 286 86 152M188 270 164 92M254 294 254 116M332 262 340 82M414 278 432 126" />
+                    <path d="M48 246 188 270M86 152 254 116M164 92 340 82M254 116 432 126M332 262 472 226" />
                   </g>
 
-                  <g>
-                    <circle class="g-node stagger-a" cx="40" cy="296" r="6" />
-                    <circle class="g-node stagger-a" cx="106" cy="318" r="6" />
-                    <circle class="g-node stagger-b" cx="188" cy="322" r="6" />
-                    <circle class="g-node stagger-b" cx="268" cy="318" r="6" />
-                    <circle class="g-node stagger-b" cx="344" cy="310" r="6" />
-                    <circle class="g-node stagger-a" cx="424" cy="300" r="6" />
-                    <circle class="g-node stagger-a" cx="478" cy="240" r="6" />
-                    <circle class="g-node stagger-c" cx="86" cy="222" r="6" />
-                    <circle class="g-node--live stagger-c" cx="176" cy="216" r="7" />
-                    <circle class="g-node stagger-d" cx="258" cy="212" r="6" />
-                    <circle class="g-node stagger-d" cx="338" cy="208" r="6" />
-                    <circle class="g-node stagger-e" cx="98" cy="108" r="6" />
-                    <circle class="g-node--live stagger-e" cx="184" cy="106" r="7" />
-                    <circle class="g-node stagger-f" cx="272" cy="112" r="6" />
-                    <circle class="g-node stagger-f" cx="360" cy="128" r="6" />
-                    <circle class="g-node stagger-g" cx="452" cy="108" r="6" />
+                  <g class="g-solution">
+                    <path d="M48 246 112 286 188 270 254 294 332 262 414 278 472 226" />
+                    <path d="M48 246 86 152 164 92 254 116 340 82 432 126 472 226" />
+                    <path d="M112 286 86 152M188 270 164 92M254 294 254 116M332 262 340 82M414 278 432 126" />
                   </g>
 
-                  <g class="delta-float">
-                    <path d="m173 148 12 0 0 12" stroke="url(#gline)" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round" />
-                    <circle cx="183" cy="155" r="2.5" fill="#B8F36B" />
+                  <g class="g-nodes">
+                    <circle cx="48" cy="246" r="5" /><circle cx="112" cy="286" r="5" /><circle cx="188" cy="270" r="5" /><circle cx="254" cy="294" r="5" /><circle cx="332" cy="262" r="5" /><circle cx="414" cy="278" r="5" /><circle cx="472" cy="226" r="5" />
+                    <circle cx="86" cy="152" r="5" /><circle cx="164" cy="92" r="5" /><circle cx="254" cy="116" r="5" /><circle cx="340" cy="82" r="5" /><circle cx="432" cy="126" r="5" />
+                  </g>
+                  <g class="g-current" filter="url(#soft-glow)">
+                    <circle cx="254" cy="116" r="9" />
+                    <path d="M254 116 340 82" />
+                  </g>
+                  <g class="g-annotation">
+                    <path d="M286 116h56" />
+                    <rect x="344" y="99" width="126" height="38" rx="9" />
+                    <text x="357" y="115">candidate edge</text>
+                    <text x="357" y="129">Δ +1.0 · feasible</text>
                   </g>
                 </svg>
+                <div class="graph-legend" aria-hidden="true"><span><i class="legend-line legend-line--selected"></i> selected solution</span><span><i class="legend-line legend-line--candidate"></i> candidate edges</span></div>
               </div>
 
               <div class="console__panel">
@@ -417,8 +403,8 @@
               <h2 class="h2">A real run, rendered by the real library</h2>
               <ul class="story-copy">
                 <li>
-                  The screenshot is an actual <strong>Maximum Planar Subgraph</strong>
-                  solve rendered with DeltaSearch&rsquo;s solver — no hand-drawn demo data.
+                  This is a real <strong>Maximum Planar Subgraph</strong>
+                  solve rendered from the repository&rsquo;s demo generator — not a decorative mockup.
                 </li>
                 <li>
                   62 nodes · 229 candidate edges. The solver keeps adding edges while a
@@ -442,7 +428,7 @@
                 </div>
                 <img
                   src="assets/screenshot-graph.png"
-                  alt="Rendered result of a Maximum Planar Subgraph solve: selected edges glow in violet and cyan over the faint input graph"
+                  alt="Rendered result of a Maximum Planar Subgraph solve: selected edges highlighted over the candidate graph"
                   width="1560"
                   height="990"
                   loading="lazy"
@@ -745,10 +731,10 @@ result = <span class="tok-cls">GreedySolver</span>(problem).solve(max_iterations
               <span>
                 More patterns — custom problems, observers, early stopping, and
                 NetworkX interop — in the
-                <a href="https://github.com/sachncs/delta-search/tree/master/docs" target="_blank" rel="noopener"><code>docs/</code></a> directory.
+                <a href="docs/"><code>developer docs</code></a>.
               </span>
               <span>
-                Install: <code>pip install delta-search</code>
+                Alpha setup: <code>git clone</code> the repo, then use <code>pip install -e .</code> locally.
               </span>
             </div>
           </div>
@@ -761,8 +747,8 @@ result = <span class="tok-cls">GreedySolver</span>(problem).solve(max_iterations
           <div class="cta__card reveal">
             <h2>Ship better <em>graphs</em>.</h2>
             <p>
-              One pip install away from six NP-hard problems, constant-time moves,
-              and a search you can actually watch converge.
+              An alpha-stage toolkit for six NP-hard problems, constant-time moves,
+              and a search you can inspect as it converges.
             </p>
             <div class="cta__actions">
               <a class="btn btn--primary" href="https://github.com/sachncs/delta-search" target="_blank" rel="noopener">
@@ -773,7 +759,7 @@ result = <span class="tok-cls">GreedySolver</span>(problem).solve(max_iterations
                 Read the arXiv paper
               </a>
             </div>
-            <p class="cta__hint">pip install delta-search · Python 3.10+ · MIT</p>
+            <p class="cta__hint">Alpha release · PyPI package coming soon · Python 3.10+ · MIT</p>
           </div>
         </div>
       </section>
@@ -809,7 +795,7 @@ result = <span class="tok-cls">GreedySolver</span>(problem).solve(max_iterations
           <div class="footer__col">
             <h4>Resources</h4>
             <ul>
-              <li><a href="https://github.com/sachncs/delta-search/tree/master/docs" target="_blank" rel="noopener">Documentation</a></li>
+              <li><a href="docs/">Documentation</a></li>
               <li><a href="https://arxiv.org/abs/2606.13834" target="_blank" rel="noopener">The ΔSearch paper</a></li>
               <li><a href="https://github.com/sachncs/delta-search/blob/master/CHANGELOG.md" target="_blank" rel="noopener">Changelog</a></li>
               <li><a href="https://github.com/sachncs/delta-search/blob/master/CONTRIBUTING.md" target="_blank" rel="noopener">Contributing</a></li>

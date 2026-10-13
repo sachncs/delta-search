@@ -31,3 +31,13 @@ def test_code_tabs_have_complete_aria_relationships() -> None:
     assert 'id="panel-py" role="tabpanel"' in html
     assert 'id="panel-cli" role="tabpanel"' in html
     assert 'id="copy-status"' in html
+
+
+def test_documentation_is_standalone_and_internal() -> None:
+    html = (SITE / "index.html").read_text(encoding="utf-8")
+    assert 'href="docs/"' in html
+    assert "github.com/sachncs/delta-search/tree/master/docs" not in html
+    for page in ("index.html", "getting-started.html", "concepts.html", "reference.html", "faq.html"):
+        doc = SITE / "docs" / page
+        assert doc.is_file(), page
+        assert "css/docs.css" in doc.read_text(encoding="utf-8")

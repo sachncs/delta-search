@@ -1511,3 +1511,127 @@ body.nav-open .nav__burger span::after {
     gap: 2rem;
   }
 }
+
+/* --- result graph ----------------------------------------------------------
+   The hero visual is a static, legible result view. It explains the two
+   meaningful states in the demo instead of simulating a graph being built. */
+
+.console__label span {
+  float: right;
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  color: #6e707d;
+}
+
+.demo-graph {
+  margin-top: 0.45rem;
+  overflow: visible;
+}
+
+.g-candidates path {
+  stroke: #3a3c49;
+  stroke-width: 1.2;
+  stroke-dasharray: 3 7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.74;
+}
+
+.g-solution path {
+  fill: none;
+  stroke: url(#gline);
+  stroke-width: 3.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.96;
+}
+
+.g-nodes circle {
+  fill: #151721;
+  stroke: #9aa4c4;
+  stroke-width: 1.5;
+}
+
+.g-current circle {
+  fill: #c5f36c;
+  opacity: 0.86;
+}
+
+.g-current path {
+  fill: none;
+  stroke: #c5f36c;
+  stroke-width: 4;
+  stroke-linecap: round;
+  opacity: 0.95;
+}
+
+.g-annotation path {
+  stroke: #c5f36c;
+  stroke-width: 1;
+  opacity: 0.75;
+}
+
+.g-annotation rect {
+  fill: #20232e;
+  stroke: #3a414f;
+  stroke-width: 1;
+}
+
+.g-annotation text {
+  fill: #aeb3c1;
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+
+.g-annotation text + text {
+  fill: #c5f36c;
+  font-size: 9px;
+}
+
+.graph-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  margin-top: 0.35rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: #7f8290;
+}
+
+.graph-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.38rem;
+}
+
+.legend-line {
+  display: inline-block;
+  width: 18px;
+  height: 2px;
+  border-radius: 2px;
+}
+
+.legend-line--selected {
+  background: linear-gradient(90deg, #86a8ff, #c5f36c);
+}
+
+.legend-line--candidate {
+  height: 1px;
+  background: repeating-linear-gradient(90deg, #626574 0 3px, transparent 3px 7px);
+}
+
+@media (max-width: 640px) {
+  .console__label span {
+    display: block;
+    float: none;
+    margin-top: 0.3rem;
+  }
+
+  .graph-legend {
+    gap: 0.55rem;
+    font-size: 0.62rem;
+  }
+}
