@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FAQ &amp; troubleshooting · DeltaSearch docs</title>
+    <meta name="description" content="Answers to common DeltaSearch alpha questions and practical troubleshooting guidance." />
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" /><link rel="stylesheet" href="../css/tokens.css" /><link rel="stylesheet" href="../css/base.css" /><link rel="stylesheet" href="../css/components.css" /><link rel="stylesheet" href="../css/docs.css" />
+  </head>
+  <body class="docs-page">
+    <header class="nav is-scrolled" id="nav"><div class="container nav__inner"><a class="nav__logo" href="../index.html#top"><img src="../assets/logo.svg" alt="" width="34" height="34" /><span>delta-search</span></a><nav aria-label="Primary"><ul class="nav__links"><li><a class="nav__link" href="../index.html#overview">Overview</a></li><li><a class="nav__link" href="../index.html#framework">Framework</a></li><li><a class="nav__link" href="./">Docs</a></li></ul></nav><div class="nav__cta"><a class="btn btn--primary btn--sm" href="https://github.com/sachncs/delta-search" target="_blank" rel="noopener">View source</a></div><button class="nav__burger" id="nav-burger" aria-label="Menu" aria-expanded="false" aria-controls="nav-panel"><span></span></button></div><div class="nav__panel container" id="nav-panel" aria-hidden="true"><a href="../index.html#overview">Overview</a><a href="../index.html#framework">Framework</a><a href="./">Docs</a><a href="https://github.com/sachncs/delta-search" target="_blank" rel="noopener">View source</a></div></header>
+    <main class="container docs-shell">
+      <aside class="docs-sidebar" aria-label="Documentation navigation"><span class="docs-sidebar__eyebrow">Developer docs</span><a class="docs-sidebar__title" href="./">DeltaSearch alpha</a><nav class="docs-sidebar__nav"><a href="./">Start here</a><a href="getting-started.html">Getting started</a><a href="concepts.html">Concepts &amp; architecture</a><a href="reference.html">API reference</a><a href="faq.html" aria-current="page">FAQ &amp; troubleshooting</a></nav><div class="docs-sidebar__note">If behavior is unclear, add a small reproducer and open an issue.</div></aside>
+      <article class="docs-main">
+        <span class="docs-kicker">Docs / FAQ</span><h1>When the run surprises you.</h1>
+        <p class="docs-lead">Heuristics are easier to debug when you can separate input problems, domain-contract bugs, and search-policy tradeoffs. Start with the closest symptom.</p>
+
+        <h2 id="alpha">Is DeltaSearch on PyPI?</h2>
+        <p>Not yet. This is an alpha release. Clone the repository and install it in editable mode with <code>python -m pip install -e ".[dev]"</code>. A PyPI release will come after the API and packaging workflow stabilize.</p>
+
+        <h2 id="optimal">Does it guarantee an optimal answer?</h2>
+        <p>No. DeltaSearch is a heuristic framework. It can find useful solutions quickly, but a greedy or beam-based run does not prove global optimality. Compare against exact solvers or known bounds when correctness requires it.</p>
+
+        <h2 id="empty">Why is my state empty?</h2>
+        <p>The default <code>evaluate_initial_state</code> creates an empty candidate graph. Built-in problems may override this. If your custom problem needs seeded nodes or terminals, return a state that contains them and test the initial state before enumerating actions.</p>
+
+        <h2 id="no-progress">Why does the solver stop without progress?</h2>
+        <ul><li>Check that <code>enumerate_actions</code> returns candidates for the current state.</li><li>Check that positive deltas use the same reward-minus-penalty sign convention as <code>objective</code>.</li><li>Check that feasible candidates are not being marked <code>feasible=False</code>.</li><li>Inspect the observer trace for a stall, target, evaluation budget, or time budget stop.</li></ul>
+        <pre><code>class DebugObserver:
+    def on_iteration_complete(self, iteration, best_action, objective):
+        print({"iteration": iteration,
+               "action": best_action,
+               "objective": objective})
+
+result = solver.solve(max_iterations=25, observer=DebugObserver())
+print(result.convergence_reason)</code></pre>
+
+        <h2 id="undo">Why did a candidate mutation leak?</h2>
+        <p>Mutate only through the problem&rsquo;s action methods. A custom action must record every changed node, edge, and attribute in its undo entry. Write a test that snapshots the entire state, applies an action, undoes it, and compares the snapshot.</p>
+
+        <h2 id="performance">Why is the “O(1)” path still slow?</h2>
+        <p>Local delta calculation is only one part of the loop. Candidate enumeration, defensive graph copies, planarity checks, observers, and dense action sets can dominate. Measure each component. Use <code>incremental=True</code> only inside a controlled solver loop that always unwinds with <code>undo_action</code>.</p>
+
+        <h2 id="optional-deps">Why does an optional feature fail to import?</h2>
+        <p>Install the matching extras from your local checkout:</p>
+        <pre><code>python -m pip install -e ".[all]"
+
+# Check the environment
+python -c "import networkx, matplotlib, sklearn; print('optional deps ready')"</code></pre>
+
+        <h2 id="thread-safe">When should I use ThreadSafeGraph?</h2>
+        <p>Use it when multiple threads share graph access or when a live graph is coordinated between workers. For a normal single-threaded solve, use <code>Graph</code>. Thread safety does not make a multi-step read atomic unless you hold the graph lock across the whole read.</p>
+
+        <h2 id="report">How do I report a bug?</h2>
+        <p>Open an issue with the Python version, commit SHA, minimal graph, problem class, solver configuration, expected result, actual result, and a short observer trace. Reproducers that run from a clean local checkout are easiest to diagnose.</p>
+        <div class="docs-footer">Back to <a href="./">documentation home →</a></div>
+      </article>
+    </main>
+    <script src="../js/main.js" defer></script>
+  </body>
+</html>

@@ -51,7 +51,7 @@ Use the following prefixes for branch names:
 |--------|---------|
 | `feat/` | New features |
 | `fix/` | Bug fixes |
-| `docs/` | Documentation changes |
+| `site/docs/` | Documentation changes |
 | `refactor/` | Code refactoring |
 | `test/` | Adding or updating tests |
 | `chore/` | Maintenance tasks |
@@ -112,8 +112,9 @@ test(graph): add edge case tests for empty graphs
 
 ## Coding Standards
 
-The repository-wide design and naming contract is documented in
-[docs/engineering.md](docs/engineering.md). New public APIs should follow it.
+The repository-wide design and naming contract is documented in the
+[developer docs](https://sachncs.github.io/delta-search/docs/concepts.html#extension-model).
+New public APIs should follow it.
 
 ### Style
 
@@ -160,6 +161,7 @@ pytest -k "test_add" -v
 ## Documentation
 
 - Update README.md for user-facing changes
+- Update the relevant standalone page under `site/docs/` for developer-facing changes
 - Add entries to CHANGELOG.md
 - Write or update docstrings
 - Consider adding examples for new features

@@ -6,7 +6,7 @@
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="License"></a>
     <a href="https://github.com/sachncs/delta-search/actions"><img src="https://img.shields.io/github/actions/workflow/status/sachncs/delta-search/ci.yml?branch=master?label=CI" alt="CI"></a>
     <a href="https://github.com/sachncs/delta-search/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green" alt="License: MIT"></a>
-    <a href="#installation"><img src="https://img.shields.io/badge/install-pip%20install%20git%2Bhttps%3A%2F%2Fgithub.com%2Fsachncs%2Fdelta-search-blue" alt="Install"></a>
+    <a href="#installation"><img src="https://img.shields.io/badge/status-alpha%20%7C%20PyPI%20coming%20soon-orange" alt="Alpha release"></a>
     <a href="https://github.com/sachncs/delta-search/stargazers"><img src="https://img.shields.io/github/stars/sachncs/delta-search" alt="Stars"></a>
   </p>
 </p>
@@ -34,13 +34,8 @@ Reward-Penalty optimization.
 
 ## Installation
 
-### From PyPI
-
-```bash
-pip install delta-search
-```
-
-### From source
+DeltaSearch is currently an alpha release and is not published to PyPI yet.
+Install it from a local checkout while the package release is prepared:
 
 ```bash
 git clone https://github.com/sachncs/delta-search.git
@@ -88,7 +83,7 @@ print(f"Converged: {result.converged} ({result.convergence_reason})")
 print(f"Iterations: {result.iteration}")
 ```
 
-See [docs/getting-started.md](docs/getting-started.md) for a detailed walkthrough.
+Read the [developer documentation](https://sachncs.github.io/delta-search/docs/) for a detailed walkthrough, architecture guide, API map, and troubleshooting paths.
 
 ---
 
@@ -231,12 +226,12 @@ delta-search/
 │   ├── cli.py                 # Command-line interface
 │   └── py.typed               # PEP 561 marker
 ├── tests/                     # Test suite (320+ tests)
-├── docs/                      # Documentation
-├── site/                      # Product landing page (GitHub Pages)
+├── site/                      # Product site and standalone developer docs
 │   ├── index.html             # Landing page markup
 │   ├── css/                   # Design tokens + component styles
 │   ├── js/                    # Page interactions
 │   ├── assets/                # Brand assets, renders, social card
+│   ├── docs/                  # Standalone developer documentation pages
 │   └── scripts/               # Asset generator (real solves → images)
 ├── .github/                   # GitHub configuration
 │   ├── workflows/

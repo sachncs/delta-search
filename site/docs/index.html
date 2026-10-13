@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Documentation · DeltaSearch</title>
+    <meta name="description" content="Developer documentation for the DeltaSearch alpha: install locally, model a problem, choose a solver, and inspect convergence." />
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" />
+    <link rel="stylesheet" href="../css/tokens.css" />
+    <link rel="stylesheet" href="../css/base.css" />
+    <link rel="stylesheet" href="../css/components.css" />
+    <link rel="stylesheet" href="../css/docs.css" />
+  </head>
+  <body class="docs-page">
+    <header class="nav is-scrolled" id="nav">
+      <div class="container nav__inner">
+        <a class="nav__logo" href="../index.html#top" aria-label="DeltaSearch home">
+          <img src="../assets/logo.svg" alt="" width="34" height="34" />
+          <span>delta-search</span>
+        </a>
+        <nav aria-label="Primary">
+          <ul class="nav__links">
+            <li><a class="nav__link" href="../index.html#overview">Overview</a></li>
+            <li><a class="nav__link" href="../index.html#framework">Framework</a></li>
+            <li><a class="nav__link" href="../index.html#problems">Problems</a></li>
+            <li><a class="nav__link" href="./">Docs</a></li>
+          </ul>
+        </nav>
+        <div class="nav__cta"><a class="btn btn--primary btn--sm" href="https://github.com/sachncs/delta-search" target="_blank" rel="noopener">View source</a></div>
+        <button class="nav__burger" id="nav-burger" aria-label="Menu" aria-expanded="false" aria-controls="nav-panel"><span></span></button>
+      </div>
+      <div class="nav__panel container" id="nav-panel" aria-hidden="true">
+        <a href="../index.html#overview">Overview</a>
+        <a href="../index.html#framework">Framework</a>
+        <a href="../index.html#problems">Problems</a>
+        <a href="./">Docs</a>
+        <a href="https://github.com/sachncs/delta-search" target="_blank" rel="noopener">View source</a>
+      </div>
+    </header>
+
+    <main class="container docs-shell">
+      <aside class="docs-sidebar" aria-label="Documentation navigation">
+        <span class="docs-sidebar__eyebrow">Developer docs</span>
+        <a class="docs-sidebar__title" href="./">DeltaSearch alpha</a>
+        <nav class="docs-sidebar__nav">
+          <a href="./" aria-current="page">Start here</a>
+          <a href="getting-started.html">Getting started</a>
+          <a href="concepts.html">Concepts &amp; architecture</a>
+          <a href="reference.html">API reference</a>
+          <a href="faq.html">FAQ &amp; troubleshooting</a>
+        </nav>
+        <div class="docs-sidebar__note">The package is not on PyPI yet. These docs assume a local editable checkout of the alpha.</div>
+      </aside>
+
+      <article class="docs-main">
+        <span class="docs-kicker">Docs / Start here</span>
+        <h1>Build a solver you can reason about.</h1>
+        <p class="docs-lead">DeltaSearch is a typed, dependency-free framework for heuristic subgraph extraction. Start with a local checkout, learn the problem contract, then choose the smallest solver that answers your question.</p>
+
+        <div class="docs-callout docs-callout--alpha">
+          <strong>Alpha release — local install only</strong>
+          <p>DeltaSearch is not published to PyPI yet. The supported path today is <code>git clone</code> followed by <code>pip install -e ".[dev]"</code>. The API may change before the first package release.</p>
+        </div>
+
+        <div class="docs-quicklinks">
+          <a class="docs-card" href="getting-started.html"><h3>Getting started →</h3><p>Install the repository, build a graph, define a problem, and run a first solve.</p></a>
+          <a class="docs-card" href="concepts.html"><h3>Understand the engine →</h3><p>Explore states, actions, deltas, undo, feasibility, and the solver loop.</p></a>
+          <a class="docs-card" href="reference.html"><h3>API reference →</h3><p>Find the public classes and methods you will use when integrating DeltaSearch.</p></a>
+          <a class="docs-card" href="faq.html"><h3>Diagnose a run →</h3><p>Work through common graph, performance, optional dependency, and concurrency issues.</p></a>
+        </div>
+
+        <h2 id="choose-path">Choose a path</h2>
+        <div class="docs-steps">
+          <div class="docs-step"><span class="docs-step__number">01</span><div><h3>I want to run a built-in problem</h3><p>Follow <a href="getting-started.html#first-solve">Getting started</a>, then swap in one of the six built-in problem classes.</p></div></div>
+          <div class="docs-step"><span class="docs-step__number">02</span><div><h3>I want to model my own objective</h3><p>Read <a href="concepts.html#problem-contract">The problem contract</a> and implement a subclass of <code>SubgraphExtractionProblem</code>.</p></div></div>
+          <div class="docs-step"><span class="docs-step__number">03</span><div><h3>I need to understand a surprising result</h3><p>Attach an observer, inspect the objective trace, and check action feasibility before changing the solver.</p></div></div>
+          <div class="docs-step"><span class="docs-step__number">04</span><div><h3>I want to extend search behavior</h3><p>Keep problem logic in the problem class and add search policy through a solver strategy. The <a href="concepts.html#extension-model">extension model</a> explains the boundary.</p></div></div>
+        </div>
+
+        <h2 id="mental-model">The short mental model</h2>
+        <p>An input <code>Graph</code> is given to a <code>SubgraphExtractionProblem</code>. The problem exposes candidate <code>Action</code>s and scores them as an incremental <code>DeltaResult</code>. A solver chooses a move, applies it, and keeps the best feasible state until a budget or stopping condition ends the run.</p>
+        <pre><code>input graph
+    ↓
+problem.evaluate_initial_state()
+    ↓
+enumerate actions → calculate delta → choose best feasible action
+    ↓                         ↘ undo rejected candidate actions
+new state → observe → repeat until budget / stall / target</code></pre>
+
+        <h2 id="principles">Working principles</h2>
+        <div class="docs-grid">
+          <div class="docs-card"><h3>Make moves local</h3><p>Use <code>calculate_delta</code> to derive objective change from the affected neighborhood. Do not re-score the entire graph for every candidate.</p></div>
+          <div class="docs-card"><h3>Keep moves reversible</h3><p>Mutations go through <code>apply_action</code> and <code>undo_action</code>. This keeps candidate evaluation isolated and makes backtracking inspectable.</p></div>
+          <div class="docs-card"><h3>Make runs observable</h3><p>Observers receive action evaluations, iteration completions, and convergence. Use them for logs, metrics, plots, and debugging.</p></div>
+          <div class="docs-card"><h3>Measure the right thing</h3><p>Separate candidate scoring cost, state-copy cost, and total solve time. “O(1) delta” does not mean the whole iteration is O(1).</p></div>
+        </div>
+
+        <div class="docs-footer">DeltaSearch alpha · Python 3.10+ · MIT licensed · <a href="https://github.com/sachncs/delta-search" target="_blank" rel="noopener">source on GitHub</a></div>
+      </article>
+    </main>
+    <script src="../js/main.js" defer></script>
+  </body>
+</html>

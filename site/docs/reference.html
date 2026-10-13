@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>API reference · DeltaSearch docs</title>
+    <meta name="description" content="A practical API reference for DeltaSearch graphs, problems, solvers, observers, and integrations." />
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" /><link rel="stylesheet" href="../css/tokens.css" /><link rel="stylesheet" href="../css/base.css" /><link rel="stylesheet" href="../css/components.css" /><link rel="stylesheet" href="../css/docs.css" />
+  </head>
+  <body class="docs-page">
+    <header class="nav is-scrolled" id="nav"><div class="container nav__inner"><a class="nav__logo" href="../index.html#top"><img src="../assets/logo.svg" alt="" width="34" height="34" /><span>delta-search</span></a><nav aria-label="Primary"><ul class="nav__links"><li><a class="nav__link" href="../index.html#overview">Overview</a></li><li><a class="nav__link" href="../index.html#framework">Framework</a></li><li><a class="nav__link" href="./">Docs</a></li></ul></nav><div class="nav__cta"><a class="btn btn--primary btn--sm" href="https://github.com/sachncs/delta-search" target="_blank" rel="noopener">View source</a></div><button class="nav__burger" id="nav-burger" aria-label="Menu" aria-expanded="false" aria-controls="nav-panel"><span></span></button></div><div class="nav__panel container" id="nav-panel" aria-hidden="true"><a href="../index.html#overview">Overview</a><a href="../index.html#framework">Framework</a><a href="./">Docs</a><a href="https://github.com/sachncs/delta-search" target="_blank" rel="noopener">View source</a></div></header>
+    <main class="container docs-shell">
+      <aside class="docs-sidebar" aria-label="Documentation navigation"><span class="docs-sidebar__eyebrow">Developer docs</span><a class="docs-sidebar__title" href="./">DeltaSearch alpha</a><nav class="docs-sidebar__nav"><a href="./">Start here</a><a href="getting-started.html">Getting started</a><a href="concepts.html">Concepts &amp; architecture</a><a href="reference.html" aria-current="page">API reference</a><a href="faq.html">FAQ &amp; troubleshooting</a></nav><div class="docs-sidebar__note">Public APIs are alpha-quality. Read the source when behavior matters.</div></aside>
+      <article class="docs-main">
+        <span class="docs-kicker">Docs / API reference</span><h1>Names you can build on.</h1>
+        <p class="docs-lead">This is a practical map of the public surface. For exact signatures and edge cases, jump from a symbol to its module in the repository.</p>
+
+        <h2 id="graph">Graph data structures</h2>
+        <div class="docs-table-wrap"><table class="docs-table"><thead><tr><th>Symbol</th><th>Use it for</th><th>Notes</th></tr></thead><tbody><tr><td><code>Graph[NodeT]</code></td><td>Undirected graph storage.</td><td>Adjacency and edge lookups are constant time. Nodes must be hashable and orderable for stable sorting.</td></tr><tr><td><code>ThreadSafeGraph[NodeT]</code></td><td>Shared graph access.</td><td>Uses an <code>RLock</code>. Live views are not compound snapshots.</td></tr><tr><td><code>Graph.from_edges</code></td><td>Build a graph from edge pairs.</td><td>Implicitly creates endpoint nodes.</td></tr><tr><td><code>subgraph</code> / <code>edge_subgraph</code></td><td>Create derived graph values.</td><td>Returns a new graph; verify ownership when attaching attributes.</td></tr></tbody></table></div>
+
+        <h2 id="domain">Domain model</h2>
+        <div class="docs-table-wrap"><table class="docs-table"><thead><tr><th>Symbol</th><th>Role</th><th>Typical use</th></tr></thead><tbody><tr><td><code>Action</code></td><td>One candidate mutation.</td><td><code>ActionType.ADD_EDGE</code>, remove node, or a domain-specific action.</td></tr><tr><td><code>DeltaResult</code></td><td>Incremental score result.</td><td>Set reward change, penalty change, and feasibility.</td></tr><tr><td><code>DefaultState</code></td><td>Small state implementation.</td><td>Use it when your problem needs no extra fields.</td></tr><tr><td><code>UndoEntry</code></td><td>Rollback record.</td><td>Usually managed by the problem implementation.</td></tr><tr><td><code>SubgraphExtractionProblem</code></td><td>Polymorphic domain boundary.</td><td>Subclass it for custom reward, penalty, actions, and constraints.</td></tr></tbody></table></div>
+
+        <h2 id="problems">Built-in problems</h2>
+        <div class="docs-cards"><div class="docs-card"><h3>MaximumPlanarSubgraphProblem</h3><p>Keep as many edges as possible while preserving planarity.</p></div><div class="docs-card"><h3>MinimumConnectedDominatingSetProblem</h3><p>Find a small connected set that dominates every vertex.</p></div><div class="docs-card"><h3>MaximumWeightedIndependentSetProblem</h3><p>Choose a high-weight set of mutually non-adjacent vertices.</p></div><div class="docs-card"><h3>PrizeCollectingVertexCoverProblem</h3><p>Trade vertex costs against uncovered-edge penalties.</p></div><div class="docs-card"><h3>UncapacitatedFacilityLocationProblem</h3><p>Choose facilities and assignments at low total cost.</p></div><div class="docs-card"><h3>MinimumWeightedSteinerTreeProblem</h3><p>Connect terminals through optional nodes and edges.</p></div></div>
+
+        <h2 id="solvers">Solver strategies</h2>
+        <div class="docs-table-wrap"><table class="docs-table"><thead><tr><th>Solver</th><th>Good first question</th></tr></thead><tbody><tr><td><code>GreedySolver</code></td><td>What does the local objective do?</td></tr><tr><td><code>MultiStartSolver</code></td><td>How sensitive is the result to the initial state?</td></tr><tr><td><code>BeamSearchSolver</code></td><td>Does keeping the top-k states improve quality?</td></tr><tr><td><code>AnytimeSolver</code></td><td>What is the best answer under a time budget?</td></tr><tr><td><code>AdaptiveBeamSolver</code></td><td>Can diversity reduce search collapse?</td></tr><tr><td><code>LearnedGuidanceSolver</code></td><td>Can optional model signals guide action choice?</td></tr><tr><td><code>MultiObjectiveSolver</code></td><td>Do I need a Pareto frontier?</td></tr><tr><td><code>StreamingSolver</code></td><td>Can the graph change while the solver runs?</td></tr></tbody></table></div>
+
+        <h2 id="controls">Budgets and observability</h2>
+        <p><code>EarlyTerminationCondition</code> accepts <code>max_iterations</code>, <code>max_evaluations</code>, <code>max_time_ms</code>, <code>objective_target</code>, and <code>stall_iterations</code>. Give at least one positive limit when constructing it.</p>
+        <pre><code>stop = EarlyTerminationCondition(
+    max_iterations=500,
+    max_time_ms=5_000,
+    stall_iterations=40,
+)
+result = GreedySolver(problem, early_stop=stop).solve(
+    observer=MetricsObserver(),
+)</code></pre>
+
+        <h2 id="optional">Optional integrations</h2>
+        <p>NetworkX conversion lives in <code>delta_search.interop</code>. Visualization helpers require matplotlib. Learned guidance requires scikit-learn. Install these only when you need them with <code>pip install -e ".[all]"</code>; core imports should remain usable without them.</p>
+        <div class="docs-footer">Next: <a href="faq.html">FAQ &amp; troubleshooting →</a></div>
+      </article>
+    </main>
+    <script src="../js/main.js" defer></script>
+  </body>
+</html>

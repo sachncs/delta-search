@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Concepts &amp; architecture · DeltaSearch docs</title>
+    <meta name="description" content="Explore the DeltaSearch graph, state, action, problem, solver, and observer architecture." />
+    <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg" /><link rel="stylesheet" href="../css/tokens.css" /><link rel="stylesheet" href="../css/base.css" /><link rel="stylesheet" href="../css/components.css" /><link rel="stylesheet" href="../css/docs.css" />
+  </head>
+  <body class="docs-page">
+    <header class="nav is-scrolled" id="nav"><div class="container nav__inner"><a class="nav__logo" href="../index.html#top"><img src="../assets/logo.svg" alt="" width="34" height="34" /><span>delta-search</span></a><nav aria-label="Primary"><ul class="nav__links"><li><a class="nav__link" href="../index.html#overview">Overview</a></li><li><a class="nav__link" href="../index.html#framework">Framework</a></li><li><a class="nav__link" href="./">Docs</a></li></ul></nav><div class="nav__cta"><a class="btn btn--primary btn--sm" href="https://github.com/sachncs/delta-search" target="_blank" rel="noopener">View source</a></div><button class="nav__burger" id="nav-burger" aria-label="Menu" aria-expanded="false" aria-controls="nav-panel"><span></span></button></div><div class="nav__panel container" id="nav-panel" aria-hidden="true"><a href="../index.html#overview">Overview</a><a href="../index.html#framework">Framework</a><a href="./">Docs</a><a href="https://github.com/sachncs/delta-search" target="_blank" rel="noopener">View source</a></div></header>
+    <main class="container docs-shell">
+      <aside class="docs-sidebar" aria-label="Documentation navigation"><span class="docs-sidebar__eyebrow">Developer docs</span><a class="docs-sidebar__title" href="./">DeltaSearch alpha</a><nav class="docs-sidebar__nav"><a href="./">Start here</a><a href="getting-started.html">Getting started</a><a href="concepts.html" aria-current="page">Concepts &amp; architecture</a><a href="reference.html">API reference</a><a href="faq.html">FAQ &amp; troubleshooting</a></nav><div class="docs-sidebar__note">The solver is heuristic. It optimizes the objective you define; it does not prove global optimality.</div></aside>
+      <article class="docs-main">
+        <span class="docs-kicker">Docs / Concepts</span><h1>One loop, clear boundaries.</h1>
+        <p class="docs-lead">DeltaSearch separates storage, domain rules, search policy, and observability. That separation is what lets the same solver work across six built-in problems and your own.</p>
+
+        <h2 id="layers">The four layers</h2>
+        <div class="docs-table-wrap"><table class="docs-table"><thead><tr><th>Layer</th><th>Owns</th><th>Should not own</th></tr></thead><tbody><tr><td><code>Graph</code></td><td>Nodes, edges, attributes, lookup and mutation.</td><td>Problem-specific feasibility or search strategy.</td></tr><tr><td><code>Problem</code></td><td>Actions, reward, penalty, feasibility, reversible domain mutations.</td><td>Global iteration policy or logging format.</td></tr><tr><td><code>Solver</code></td><td>Candidate selection, budgets, stopping, best-state tracking.</td><td>How a domain objective is calculated.</td></tr><tr><td><code>Observer</code></td><td>Logs, metrics, traces, progress, and external reporting.</td><td>Changing the chosen action or mutating solver state.</td></tr></tbody></table></div>
+
+        <h2 id="state-loop">The state loop</h2>
+        <p>Each iteration starts from a current state. The problem enumerates candidate actions. The solver temporarily applies candidates, asks for their deltas, undoes them, and commits the best feasible improvement. The committed state becomes the next iteration&rsquo;s input.</p>
+        <pre><code>state₀
+  │
+  ├─ enumerate_actions(state₀)
+  │       │
+  │       ├─ apply_action(candidate A) → calculate_delta → undo_action
+  │       ├─ apply_action(candidate B) → calculate_delta → undo_action
+  │       └─ apply_action(candidate C) → calculate_delta → undo_action
+  │
+  └─ commit best candidate → state₁ → repeat</code></pre>
+        <div class="docs-callout"><strong>Why undo matters</strong><p>Candidate evaluation should not leak mutations into the next candidate. The undo record is the transaction boundary. If a custom action changes more than the default graph mutation captures, extend the undo data and test the exact inverse.</p></div>
+
+        <h2 id="problem-contract">The problem contract</h2>
+        <p>A problem is a domain adapter. It tells DeltaSearch what a move means and how valuable it is.</p>
+        <div class="docs-cards"><div class="docs-card"><h3><code>enumerate_actions</code></h3><p>Return legal candidates worth considering. Prefer bounded, deterministic ordering when reproducibility matters.</p></div><div class="docs-card"><h3><code>calculate_delta</code></h3><p>Return reward change, penalty change, and feasibility for a candidate. Use local context; avoid a full graph scan.</p></div><div class="docs-card"><h3><code>apply_action</code> / <code>undo_action</code></h3><p>Make a mutation reversible. The default path copies defensively; the incremental path trades isolation for speed.</p></div><div class="docs-card"><h3><code>objective</code> and feasibility</h3><p>Objective is reward minus penalty. A feasible state satisfies hard constraints independently of its score.</p></div></div>
+
+        <h2 id="extension-model">Extension model</h2>
+        <p>Choose the narrowest extension point that solves the problem:</p>
+        <ol><li>Need a new domain? Add a <code>SubgraphExtractionProblem</code> subclass.</li><li>Need a new selection policy? Add a solver strategy that consumes the same problem interface.</li><li>Need a new output? Add an observer or serializer.</li><li>Need a new graph primitive? Extend <code>Graph</code> with tests for complexity, ownership, and reversibility.</li></ol>
+        <p>This keeps polymorphism useful rather than ornamental: callers depend on the problem and observer protocols, while concrete implementations vary behind them.</p>
+
+        <h2 id="ownership">Ownership and concurrency</h2>
+        <p>The plain <code>Graph</code> is the fast single-threaded value. <code>ThreadSafeGraph</code> wraps mutations and snapshot-producing methods with an <code>RLock</code>. Its live <code>nodes</code> and <code>edges</code> views are not multi-read snapshots; use <code>node_list()</code>, <code>sorted_edges()</code>, or hold <code>graph.lock</code> across a compound read.</p>
+        <p>Solver instances should own their problem instances. Share input data intentionally, and do not retain a mutable internal state object after a solve unless the API says it is safe.</p>
+
+        <h2 id="performance">What O(1) actually means</h2>
+        <p>DeltaSearch&rsquo;s O(1) claim applies to the local delta calculation for a candidate move. It does not make action enumeration, state copying, feasibility checks, or a full iteration constant time. Benchmark these pieces separately before opting into <code>incremental=True</code>.</p>
+        <pre><code>total solve time
+  = enumeration
+  + candidate apply / undo
+  + delta evaluation
+  + feasibility checks
+  + observer overhead
+  + state-copy cost</code></pre>
+
+        <div class="docs-footer">Next: <a href="reference.html">API reference →</a></div>
+      </article>
+    </main>
+    <script src="../js/main.js" defer></script>
+  </body>
+</html>
