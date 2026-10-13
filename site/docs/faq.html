@@ -20,6 +20,9 @@
         <h2 id="optimal">Does it guarantee an optimal answer?</h2>
         <p>No. DeltaSearch is a heuristic framework. It can find useful solutions quickly, but a greedy or beam-based run does not prove global optimality. Compare against exact solvers or known bounds when correctness requires it.</p>
 
+        <h2 id="planarity">Does Maximum Planar Subgraph prove planarity?</h2>
+        <p>Not by itself. The current core feasibility helper applies Euler&rsquo;s edge bound component by component. That is a necessary condition, not a complete planarity test, so it can admit non-planar graphs that stay under the bound. Use a complete planarity oracle such as NetworkX&rsquo;s <code>check_planarity</code> when the guarantee matters.</p>
+
         <h2 id="empty">Why is my state empty?</h2>
         <p>The default <code>evaluate_initial_state</code> creates an empty candidate graph. Built-in problems may override this. If your custom problem needs seeded nodes or terminals, return a state that contains them and test the initial state before enumerating actions.</p>
 
