@@ -144,7 +144,6 @@ class AnytimeSolver(Generic[NodeT]):
             raise ValueError(f"max_iterations must be positive, got {max_iterations}")
 
         with attach_observer(self.problem, observer):
-
             state = self.problem.evaluate_initial_state(self.problem.graph)
             current_objective = self.problem.objective(state)
 
@@ -155,7 +154,7 @@ class AnytimeSolver(Generic[NodeT]):
             progress: deque[ProgressSnapshot[NodeT]] = deque(maxlen=self.max_history)
             start_time = time.monotonic()
 
-        # Record initial snapshot
+            # Record initial snapshot
             progress.append(
                 ProgressSnapshot(
                     iteration=0,
@@ -220,7 +219,7 @@ class AnytimeSolver(Generic[NodeT]):
                 else:
                     stall_count += 1
 
-            # Record snapshot at intervals
+                # Record snapshot at intervals
                 if (iteration + 1) % self.snapshot_interval == 0:
                     progress.append(
                         ProgressSnapshot(
@@ -230,7 +229,10 @@ class AnytimeSolver(Generic[NodeT]):
                             elapsed_ms=elapsed_total,
                         )
                     )
-                    if self.max_history is not None and len(progress) > self.max_history:
+                    if (
+                        self.max_history is not None
+                        and len(progress) > self.max_history
+                    ):
                         progress.popleft()  # drop oldest snapshot to honour the cap
 
                 self.problem.observer.on_iteration_complete(
@@ -240,7 +242,7 @@ class AnytimeSolver(Generic[NodeT]):
                 )
                 self.problem.on_iteration_end(state, iteration)
 
-            # Check termination
+                # Check termination
                 if (
                     self.early_stop.max_time_ms is not None
                     and elapsed_total >= self.early_stop.max_time_ms
@@ -274,7 +276,7 @@ class AnytimeSolver(Generic[NodeT]):
 
             elapsed_ms = (time.monotonic() - start_time) * 1000
 
-        # Final snapshot
+            # Final snapshot
             progress.append(
                 ProgressSnapshot(
                     iteration=iteration + 1 if iteration >= 0 else 0,

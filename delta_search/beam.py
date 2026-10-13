@@ -129,8 +129,14 @@ class BeamSearchSolver(Generic[NodeT]):
         if max_iterations <= 0:
             raise ValueError(f"max_iterations must be positive, got {max_iterations}")
 
+        if (
+            self.early_stop.max_iterations is not None
+            and self.early_stop.max_iterations <= 0
+        ):
+            raise ValueError("early_stop.max_iterations must be positive when set")
+
         with attach_observer(self.problem, observer):
-        # Initialize beam with the initial state
+            # Initialize beam with the initial state
             initial_state = self.problem.evaluate_initial_state(self.problem.graph)
             initial_obj = self.problem.objective(initial_state)
             beam: list[_BeamCandidate[NodeT]] = [
@@ -156,6 +162,7 @@ class BeamSearchSolver(Generic[NodeT]):
             for iteration in range(limit):
                 successors: list[_BeamCandidate[NodeT]] = []
 
+                previous_best = best_objective
                 for beam_idx, candidate in enumerate(beam):
                     actions = self.problem.enumerate_actions(candidate.state)
                     for action in actions:
@@ -164,11 +171,13 @@ class BeamSearchSolver(Generic[NodeT]):
                             continue
 
                         obj = (
-                            candidate.objective + delta.reward_change - delta.penalty_change
+                            candidate.objective
+                            + delta.reward_change
+                            - delta.penalty_change
                         )
                         total_evaluations += 1
 
-                    # Create successor state
+                        # Create successor state
                         new_state = self.problem.apply_action(
                             candidate.state,
                             action,
@@ -187,13 +196,13 @@ class BeamSearchSolver(Generic[NodeT]):
                     convergence_reason = "no feasible successors"
                     break
 
-            # Retain top-K successors
+                # Retain top-K successors
                 successors.sort(key=lambda c: c.objective, reverse=True)
                 new_beam = successors[: self.beam_width]
 
-            # Check for improvement
+                # Check for improvement
                 new_best = max(c.objective for c in new_beam)
-                if new_best <= best_objective:
+                if new_best <= previous_best:
                     stall_count += 1
                 else:
                     stall_count = 0
@@ -209,7 +218,7 @@ class BeamSearchSolver(Generic[NodeT]):
                         best_in_beam.objective,
                     )
 
-            # Check termination
+                # Check termination
                 if (
                     self.early_stop.max_time_ms is not None
                     and elapsed >= self.early_stop.max_time_ms

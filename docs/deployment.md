@@ -42,7 +42,7 @@ pre-commit install
 ```python
 from delta_search import ThreadSafeGraph, GreedySolver
 
-# ThreadSafeGraph wraps all methods (including reads) with RLock
+# ThreadSafeGraph wraps mutating and snapshot-producing operations with RLock
 graph = ThreadSafeGraph[int]()
 graph.add_edge(1, 2)
 sub = graph.subgraph([1, 2])  # Thread-safe
@@ -91,6 +91,7 @@ CMD ["python", "-c", "from delta_search import Graph; print('Ready')"]
 import json
 from delta_search import Graph, MaximumPlanarSubgraphProblem, GreedySolver
 
+
 def lambda_handler(event, context):
     graph = Graph[int]()
     for edge in event.get("edges", []):
@@ -102,10 +103,12 @@ def lambda_handler(event, context):
 
     return {
         "statusCode": 200,
-        "body": json.dumps({
-            "objective": result.best_objective,
-            "iterations": result.iteration,
-        })
+        "body": json.dumps(
+            {
+                "objective": result.best_objective,
+                "iterations": result.iteration,
+            }
+        ),
     }
 ```
 
@@ -135,6 +138,7 @@ logger.info(f"Completed: objective={result.best_objective}")
 ```python
 from delta_search import SolverObserver, DeltaResult, Action
 
+
 class MetricsObserver:
     def __init__(self):
         self.evaluations = 0
@@ -150,6 +154,7 @@ class MetricsObserver:
 
     def on_convergence(self, iterations, final_objective):
         pass
+
 
 observer = MetricsObserver()
 solver.solve(max_iterations=100, observer=observer)
@@ -171,6 +176,7 @@ print(f"Total evaluations: {observer.evaluations}")
 
 ```python
 import logging
+
 logging.basicConfig(level=logging.DEBUG)
 
 # This will show detailed solver progress

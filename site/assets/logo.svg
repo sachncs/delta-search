@@ -1,27 +1,21 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="DeltaSearch logo">
-  <title>DeltaSearch</title>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-labelledby="title desc">
+  <title id="title">DeltaSearch mark</title>
+  <desc id="desc">Three connected graph nodes form a delta with an offset path showing an incremental search step.</desc>
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#17171E"/>
-      <stop offset="1" stop-color="#0A0A0E"/>
+    <linearGradient id="surface" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1A1F2C"/>
+      <stop offset="1" stop-color="#101217"/>
     </linearGradient>
-    <linearGradient id="accent" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#8A7CFF"/>
-      <stop offset="1" stop-color="#4CC9F0"/>
+    <linearGradient id="edge" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#88A0FF"/>
+      <stop offset="1" stop-color="#B8F36B"/>
     </linearGradient>
-    <radialGradient id="halo" cx="0.5" cy="0.5" r="0.5">
-      <stop offset="0" stop-color="#8A7CFF" stop-opacity="0.55"/>
-      <stop offset="1" stop-color="#8A7CFF" stop-opacity="0"/>
-    </radialGradient>
   </defs>
-
-  <rect width="512" height="512" rx="116" fill="url(#bg)"/>
-
-  <circle cx="256" cy="280" r="120" fill="url(#halo)" opacity="0.5"/>
-  <rect x="1" y="1" width="510" height="510" rx="115" fill="none" stroke="#FFFFFF" stroke-opacity="0.09" stroke-width="2"/>
-
-  <path d="M256 118 L416 366 L96 366 Z" fill="none" stroke="url(#accent)" stroke-width="42" stroke-linejoin="round" stroke-linecap="round"/>
-
-  <circle cx="256" cy="282" r="24" fill="#0B0B0F"/>
-  <circle cx="256" cy="282" r="15" fill="#F5F5F7"/>
+  <rect width="512" height="512" rx="112" fill="url(#surface)"/>
+  <path d="M118 370 256 118l138 252" fill="none" stroke="url(#edge)" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M142 370h228" fill="none" stroke="#5367E8" stroke-width="30" stroke-linecap="round"/>
+  <path d="M194 286h104" fill="none" stroke="#FF7A66" stroke-width="18" stroke-linecap="round" stroke-dasharray="12 18"/>
+  <circle cx="118" cy="370" r="27" fill="#F7F8FA"/>
+  <circle cx="256" cy="118" r="27" fill="#F7F8FA"/>
+  <circle cx="394" cy="370" r="27" fill="#B8F36B"/>
 </svg>

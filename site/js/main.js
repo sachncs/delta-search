@@ -13,6 +13,13 @@
   function setNavOpen(open) {
     document.body.classList.toggle("nav-open", open);
     if (burger) burger.setAttribute("aria-expanded", String(open));
+    if (panel) panel.setAttribute("aria-hidden", String(!open));
+    if (open && panel) {
+      var firstLink = panel.querySelector("a");
+      if (firstLink) firstLink.focus();
+    } else if (!open && burger) {
+      burger.focus();
+    }
   }
 
   function onScroll() {
@@ -33,7 +40,29 @@
     });
 
     document.addEventListener("keydown", function (event) {
-      if (event.key === "Escape") setNavOpen(false);
+      if (!document.body.classList.contains("nav-open")) return;
+      if (event.key === "Escape") {
+        setNavOpen(false);
+        return;
+      }
+      if (event.key !== "Tab") return;
+      var focusable = panel.querySelectorAll("a, button");
+      if (!focusable.length) return;
+      var first = focusable[0];
+      var last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    });
+
+    document.addEventListener("click", function (event) {
+      if (document.body.classList.contains("nav-open") && nav && !nav.contains(event.target)) {
+        setNavOpen(false);
+      }
     });
 
     window.addEventListener("resize", function () {
@@ -124,6 +153,7 @@
       var active = tab.getAttribute("data-tab") === name;
       tab.classList.toggle("is-active", active);
       tab.setAttribute("aria-selected", String(active));
+      tab.setAttribute("tabindex", active ? "0" : "-1");
     });
     panes.forEach(function (pane) {
       var show = pane.getAttribute("data-pane") === name;
@@ -137,9 +167,21 @@
     tab.addEventListener("click", function () {
       activateTab(tab.getAttribute("data-tab"));
     });
+
+    tab.addEventListener("keydown", function (event) {
+      if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
+      event.preventDefault();
+      var index = Array.prototype.indexOf.call(tabs, tab);
+      var next = event.key === "ArrowRight" ? index + 1 : index - 1;
+      next = (next + tabs.length) % tabs.length;
+      var nextTab = tabs[next];
+      activateTab(nextTab.getAttribute("data-tab"));
+      nextTab.focus();
+    });
   });
 
   if (copyBtn) {
+    var copyStatus = document.getElementById("copy-status");
     function copyLegacy(text) {
       var ta = document.createElement("textarea");
       ta.value = text;
@@ -161,6 +203,7 @@
       var text = active.textContent;
       var flash = function () {
         copyBtn.textContent = "Copied ✓";
+        if (copyStatus) copyStatus.textContent = "Code copied to clipboard.";
         setTimeout(function () {
           copyBtn.textContent = "Copy";
         }, 1800);

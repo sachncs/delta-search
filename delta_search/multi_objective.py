@@ -248,7 +248,6 @@ class MultiObjectiveSolver(Generic[NodeT]):
             raise ValueError(f"max_iterations must be positive, got {max_iterations}")
 
         with attach_observer(self.problem, observer):
-
             state = self.problem.evaluate_initial_state(self.problem.graph)
             current_objective = self.problem.objective(state)
 
@@ -257,7 +256,7 @@ class MultiObjectiveSolver(Generic[NodeT]):
             stall_count = 0
             start_time = time.monotonic()
 
-        # Initialize Pareto front
+            # Initialize Pareto front
             init_objs = self._compute_objectives(state)
             init_scalar = self._scalarize(init_objs)
             pareto_front: list[ParetoPoint[NodeT]] = [
@@ -307,7 +306,7 @@ class MultiObjectiveSolver(Generic[NodeT]):
                 state = self.problem.apply_action(state, best_action)
                 current_objective = best_action_obj
 
-            # Update Pareto front
+                # Update Pareto front
                 objs = self._compute_objectives(state)
                 scalar = self._scalarize(objs)
                 point: ParetoPoint[NodeT] = ParetoPoint(
@@ -338,7 +337,7 @@ class MultiObjectiveSolver(Generic[NodeT]):
                 )
                 self.problem.on_iteration_end(state, iteration)
 
-            # Check termination
+                # Check termination
                 if (
                     self.early_stop.max_time_ms is not None
                     and elapsed_total >= self.early_stop.max_time_ms
@@ -372,7 +371,7 @@ class MultiObjectiveSolver(Generic[NodeT]):
 
             elapsed_ms = (time.monotonic() - start_time) * 1000
 
-        # Find best scalarized in Pareto front
+            # Find best scalarized in Pareto front
             best_pareto = max(pareto_front, key=lambda p: p.scalarized)
 
             if observer:

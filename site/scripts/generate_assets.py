@@ -5,7 +5,7 @@ The graphs and convergence curves are produced by running the package's own
 solvers on real instances, then rendered in the site's visual language.
 
 Outputs (into site/assets/):
-    screenshot-graph.png       -- solved Prize Collecting Vertex Cover instance
+    screenshot-graph.png       -- solved Maximum Planar Subgraph instance
     screenshot-convergence.png -- objective-as-a-function-of-iteration
     og.png                     -- social share card (1200x630)
 """
@@ -45,8 +45,8 @@ BG = "#0B0B0F"
 BG_SOFT = "#14141C"
 INK = "#F5F5F7"
 MUTED = "#9A9BA6"
-VIOLET = "#8A7CFF"
-CYAN = "#4CC9F0"
+VIOLET = "#5367E8"
+CYAN = "#B8F36B"
 EDGE_INPUT = "#2A2A34"
 NODE_INPUT = "#202028"
 EDGE_SOLUTION = "#6E8CFF"

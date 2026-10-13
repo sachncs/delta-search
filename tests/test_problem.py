@@ -272,6 +272,14 @@ class TestApplyAction:
         restored = problem.undo_action(new_state)
         assert not restored.graph.has_edge(1, 2)
 
+    def test_undo_add_edge_removes_implicit_endpoints(self) -> None:
+        g = Graph[int](nodes=[1, 2])
+        problem = SimpleProblem(g)
+        state = SimpleState(graph=Graph[int]())
+        action = Action(ActionType.ADD_EDGE, (1, 2))
+        restored = problem.undo_action(problem.apply_action(state, action))
+        assert restored.graph == state.graph
+
     def test_undo_remove_edge(self) -> None:
         g = Graph[int].from_edges([(1, 2)])
         problem = SimpleProblem(g)

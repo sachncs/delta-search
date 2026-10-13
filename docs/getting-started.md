@@ -34,10 +34,10 @@ g.add_edge(2, 3)
 g.add_edge(3, 1)
 
 # Check properties
-print(g.num_nodes)      # 3
-print(g.num_edges)      # 3
-print(g.neighbors(1))   # frozenset({2, 3})
-print(g.has_edge(1, 2)) # True
+print(g.num_nodes)  # 3
+print(g.num_edges)  # 3
+print(g.neighbors(1))  # frozenset({2, 3})
+print(g.has_edge(1, 2))  # True
 ```
 
 ### Action
@@ -76,9 +76,11 @@ from typing import Any
 from delta_search import Graph, SubgraphState
 from delta_search.problem import UndoEntry
 
+
 @dataclass
 class MaxEdgesState:
     """State tracking the current subgraph and its properties."""
+
     graph: Graph[int]
     undo: UndoEntry | None = None
     metrics: dict[str, Any] = field(default_factory=dict)
@@ -101,6 +103,7 @@ from delta_search import (
     ActionType,
     DeltaResult,
 )
+
 
 class MaxEdgesProblem(SubgraphExtractionProblem[int]):
     """Find subgraph with maximum edges."""
@@ -164,15 +167,21 @@ Monitor solver behavior with the observer protocol:
 ```python
 from delta_search import SolverObserver, Action, DeltaResult
 
+
 class LoggingObserver:
-    def on_action_evaluated(self, action: Action, delta: DeltaResult, elapsed_ms: float) -> None:
+    def on_action_evaluated(
+        self, action: Action, delta: DeltaResult, elapsed_ms: float
+    ) -> None:
         print(f"Evaluated {action}: Δreward={delta.reward_change:+.1f}")
 
-    def on_iteration_complete(self, iteration: int, best_action: Action | None, objective: float) -> None:
+    def on_iteration_complete(
+        self, iteration: int, best_action: Action | None, objective: float
+    ) -> None:
         print(f"Iteration {iteration}: objective={objective:.2f}")
 
     def on_convergence(self, iterations: int, final_objective: float) -> None:
         print(f"Converged after {iterations} iterations: {final_objective:.2f}")
+
 
 solver = GreedySolver(problem)
 result = solver.solve(max_iterations=100, observer=LoggingObserver())
@@ -221,7 +230,7 @@ import networkx as nx
 nx_graph = nx.complete_graph(5)
 ds_graph = from_networkx(nx_graph)  # → Graph[int]
 
-nx_back = to_networkx(ds_graph)     # → nx.Graph
+nx_back = to_networkx(ds_graph)  # → nx.Graph
 ```
 
 ## CLI Usage

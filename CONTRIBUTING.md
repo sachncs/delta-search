@@ -112,6 +112,9 @@ test(graph): add edge case tests for empty graphs
 
 ## Coding Standards
 
+The repository-wide design and naming contract is documented in
+[docs/engineering.md](docs/engineering.md). New public APIs should follow it.
+
 ### Style
 
 - Use **ruff** for linting and formatting

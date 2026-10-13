@@ -40,6 +40,12 @@ class TestSaveLoadGraph:
         assert g2.num_nodes == 0
         assert g2.num_edges == 0
 
+    def test_save_rejects_non_json_attributes(self, tmp_path: Path) -> None:
+        graph = Graph[int](nodes=[1])
+        graph.node_data(1)["bad"] = object()
+        with pytest.raises(TypeError):
+            save_graph(graph, tmp_path / "invalid.json")
+
     def test_json_format(self) -> None:
         g = Graph[int].from_edges([(1, 2), (2, 3)])
 
@@ -67,20 +73,36 @@ class TestSaveLoadGraph:
     def test_missing_node_id(self, tmp_path: Path) -> None:
         bad_file = tmp_path / "no_id.json"
         bad_file.write_text('{"nodes": [{"label": "a"}], "edges": []}')
-        with pytest.raises(KeyError):
+        with pytest.raises(ValueError):
             load_graph(bad_file)
 
     def test_missing_edge_source(self, tmp_path: Path) -> None:
         bad_file = tmp_path / "no_source.json"
         bad_file.write_text('{"nodes": [{"id": 1}], "edges": [{"target": 2}]}')
-        with pytest.raises(KeyError):
+        with pytest.raises(ValueError):
             load_graph(bad_file)
 
     def test_missing_edge_target(self, tmp_path: Path) -> None:
         bad_file = tmp_path / "no_target.json"
         bad_file.write_text('{"nodes": [{"id": 1}], "edges": [{"source": 1}]}')
-        with pytest.raises(KeyError):
+        with pytest.raises(ValueError):
             load_graph(bad_file)
+
+    @pytest.mark.parametrize(
+        "payload",
+        [
+            {"nodes": {}, "edges": []},
+            {"nodes": [], "edges": {}},
+            {"nodes": [], "edges": [{"source": 1}]},
+        ],
+    )
+    def test_invalid_graph_schema(
+        self, tmp_path: Path, payload: dict[str, object]
+    ) -> None:
+        path = tmp_path / "invalid.json"
+        path.write_text(json.dumps(payload), encoding="utf-8")
+        with pytest.raises(ValueError):
+            load_graph(path)
 
     def test_empty_arrays(self, tmp_path: Path) -> None:
         empty_file = tmp_path / "empty.json"
@@ -159,7 +181,9 @@ class TestIoNonIntNodes:
             ("x", "y", "z", "w", "v"),
         ],
     )
-    def test_string_node_roundtrip(self, labels: tuple[str, ...], tmp_path: Path) -> None:
+    def test_string_node_roundtrip(
+        self, labels: tuple[str, ...], tmp_path: Path
+    ) -> None:
         g = Graph[str]()
         for i in range(len(labels) - 1):
             g.add_edge(labels[i], labels[i + 1])

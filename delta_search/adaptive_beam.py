@@ -180,8 +180,7 @@ class AdaptiveBeamSolver(Generic[NodeT]):
             raise ValueError(f"max_iterations must be positive, got {max_iterations}")
 
         with attach_observer(self.problem, observer):
-
-        # Initialize beams from random starts
+            # Initialize beams from random starts
             initial_state = self.problem.evaluate_initial_state(self.problem.graph)
             initial_obj = self.problem.objective(initial_state)
 
@@ -219,7 +218,9 @@ class AdaptiveBeamSolver(Generic[NodeT]):
                         if not delta.feasible:
                             continue
 
-                        obj = beam.objective + delta.reward_change - delta.penalty_change
+                        obj = (
+                            beam.objective + delta.reward_change - delta.penalty_change
+                        )
                         total_evaluations += 1
 
                         elapsed = (time.monotonic() - start_time) * 1000
@@ -236,10 +237,10 @@ class AdaptiveBeamSolver(Generic[NodeT]):
                     convergence_reason = "no feasible actions"
                     break
 
-            # Sort by objective (best first)
+                # Sort by objective (best first)
                 all_candidates.sort(key=lambda x: x[2], reverse=True)
 
-            # Select top-K with diversity
+                # Select top-K with diversity
                 new_beams: list[BeamState[NodeT]] = []
                 selected_states: list[SubgraphState[NodeT]] = []
 
@@ -249,10 +250,10 @@ class AdaptiveBeamSolver(Generic[NodeT]):
 
                     new_state = self.problem.apply_action(beam.state, action)
 
-                # Diversity check
+                    # Diversity check
                     diversity = self._compute_diversity(new_state, selected_states)
 
-                # Only add if diverse enough or beam is not full
+                    # Only add if diverse enough or beam is not full
                     if len(new_beams) < current_width // 2 or diversity > 0.1:
                         new_beam = BeamState(
                             state=new_state,
@@ -270,7 +271,7 @@ class AdaptiveBeamSolver(Generic[NodeT]):
 
                 beams = new_beams
 
-            # Update best
+                # Update best
                 for beam_idx, beam in enumerate(beams):
                     if beam.objective > best_objective:
                         best_objective = beam.objective
@@ -279,7 +280,7 @@ class AdaptiveBeamSolver(Generic[NodeT]):
 
                 elapsed_total = (time.monotonic() - start_time) * 1000
 
-            # Adaptive width
+                # Adaptive width
                 if self.adaptive_width and iteration > 0:
                     recent_improvement = best_objective - (
                         beams[0].objective if beams else best_objective
@@ -300,7 +301,7 @@ class AdaptiveBeamSolver(Generic[NodeT]):
                 )
                 self.problem.on_iteration_end(beams[0].state, iteration)
 
-            # Check termination
+                # Check termination
                 if (
                     self.early_stop.max_time_ms is not None
                     and elapsed_total >= self.early_stop.max_time_ms

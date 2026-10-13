@@ -101,7 +101,9 @@ def get_logger(name: str) -> logging.Logger:
         A logger whose parent is the ``delta_search`` package logger,
         so its effective level respects ``DELTA_SEARCH_LOG_LEVEL``.
     """
-    return logging.getLogger(name)
+    if name == _PACKAGE_LOGGER_NAME or name.startswith(f"{_PACKAGE_LOGGER_NAME}."):
+        return logging.getLogger(name)
+    return logging.getLogger(f"{_PACKAGE_LOGGER_NAME}.{name}")
 
 
 def default_seed() -> int | None:

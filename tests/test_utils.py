@@ -68,6 +68,7 @@ class TestIsPlanar:
 
     def test_planary_alias_warns(self) -> None:
         import warnings
+
         with warnings.catch_warnings(record=True) as caught:
             warnings.simplefilter("always")
             assert is_planary(Graph[int]())

@@ -97,7 +97,7 @@
         </button>
       </div>
 
-      <div class="nav__panel container" id="nav-panel">
+      <div class="nav__panel container" id="nav-panel" aria-hidden="true">
         <a href="#overview">Overview</a>
         <a href="#framework">Framework</a>
         <a href="#problems">Problems</a>
@@ -161,8 +161,8 @@
                 <svg class="demo-graph" viewBox="0 0 520 330" fill="none" role="img" aria-label="Animated illustration of the search graph being constructed">
                   <defs>
                     <linearGradient id="gline" x1="0" y1="0" x2="1" y2="1">
-                      <stop offset="0" stop-color="#8A7CFF" />
-                      <stop offset="1" stop-color="#4CC9F0" />
+                      <stop offset="0" stop-color="#5367E8" />
+                      <stop offset="1" stop-color="#B8F36B" />
                     </linearGradient>
                   </defs>
 
@@ -215,7 +215,7 @@
 
                   <g class="delta-float">
                     <path d="m173 148 12 0 0 12" stroke="url(#gline)" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round" />
-                    <circle cx="183" cy="155" r="2.5" fill="#4CC9F0" />
+                    <circle cx="183" cy="155" r="2.5" fill="#B8F36B" />
                   </g>
                 </svg>
               </div>
@@ -231,12 +231,12 @@
                   <svg class="objective__chart" viewBox="0 0 460 240" fill="none" aria-hidden="true">
                     <defs>
                       <linearGradient id="ofill" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0" stop-color="#8A7CFF" stop-opacity="0.35" />
-                        <stop offset="1" stop-color="#8A7CFF" stop-opacity="0" />
+                        <stop offset="0" stop-color="#5367E8" stop-opacity="0.35" />
+                        <stop offset="1" stop-color="#5367E8" stop-opacity="0" />
                       </linearGradient>
                       <linearGradient id="oline" x1="0" y1="0" x2="1" y2="0">
-                        <stop offset="0" stop-color="#8A7CFF" />
-                        <stop offset="1" stop-color="#4CC9F0" />
+                        <stop offset="0" stop-color="#5367E8" />
+                        <stop offset="1" stop-color="#B8F36B" />
                       </linearGradient>
                     </defs>
                     <path
@@ -592,7 +592,7 @@
                 </span>
                 <div>
                   <h3>Thread-safe by default</h3>
-                  <p><code>ThreadSafeGraph</code> wraps every read and write in an <code>RLock</code> for safe parallel search.</p>
+                  <p><code>ThreadSafeGraph</code> protects mutations and explicit snapshots with an <code>RLock</code>; hold the lock when coordinating live views.</p>
                 </div>
               </div>
 
@@ -696,8 +696,8 @@
 
           <div class="reveal" style="--d: 120ms">
             <div class="code__tabs" role="tablist" aria-label="Code examples">
-              <button class="code__tab is-active" role="tab" aria-selected="true" data-tab="py">Python API</button>
-              <button class="code__tab" role="tab" aria-selected="false" data-tab="cli">CLI</button>
+              <button class="code__tab is-active" id="tab-py" role="tab" aria-selected="true" aria-controls="panel-py" tabindex="0" data-tab="py">Python API</button>
+              <button class="code__tab" id="tab-cli" role="tab" aria-selected="false" aria-controls="panel-cli" tabindex="-1" data-tab="cli">CLI</button>
             </div>
 
             <div class="code__win">
@@ -710,7 +710,7 @@
                 </button>
               </div>
 
-              <div class="code__pane" data-pane="py">
+              <div class="code__pane" id="panel-py" role="tabpanel" aria-labelledby="tab-py" data-pane="py">
 <pre class="code__pre"><code><span class="tok-kw">from</span> delta_search <span class="tok-kw">import</span> <span class="tok-cls">Graph</span>, <span class="tok-cls">GreedySolver</span>, <span class="tok-cls">PrizeCollectingVertexCoverProblem</span>
 
 <span class="tok-com"># Build an input graph with O(1) adjacency lookups.</span>
@@ -728,7 +728,7 @@ result = <span class="tok-cls">GreedySolver</span>(problem).solve(max_iterations
 </code></pre>
               </div>
 
-              <div class="code__pane" data-pane="cli" hidden>
+              <div class="code__pane" id="panel-cli" role="tabpanel" aria-labelledby="tab-cli" data-pane="cli" hidden>
 <pre class="code__pre"><code><span class="tok-com"># Solve a graph and write the solution to JSON.</span>
 <span class="tok-prompt">$</span> delta-search solve --problem mps --graph input.json --output result.json
 
@@ -739,6 +739,7 @@ result = <span class="tok-cls">GreedySolver</span>(problem).solve(max_iterations
 </code></pre>
               </div>
             </div>
+            <div id="copy-status" class="sr-only" aria-live="polite" aria-atomic="true"></div>
 
             <div class="code__foot">
               <span>

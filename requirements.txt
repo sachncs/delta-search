@@ -1,1 +1,1 @@
--e file:.["all"]
+-e .[all]

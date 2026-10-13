@@ -40,7 +40,7 @@ jobs:
           python-version: "3.12"
 
       - name: Install dependencies
-        run: pip install mypy
+        run: pip install -e ".[dev,all]"
 
       - name: mypy
         run: mypy delta_search/
@@ -58,7 +58,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install pip-audit
-          pip install -e ".[dev]"
+          pip install -e ".[dev,all]"
 
       - name: Run pip-audit
         run: pip-audit
@@ -77,7 +77,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install package with dev deps
-        run: pip install -e ".[dev]"
+        run: pip install -e ".[dev,all]"
 
       - name: Run tests
         run: pytest --cov=delta_search --cov-report=xml --cov-fail-under=80 -v
@@ -88,6 +88,22 @@ jobs:
         with:
           file: ./coverage.xml
           fail_ci_if_error: false
+
+  site:
+    name: Site Smoke Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Install test tooling
+        run: pip install pytest
+
+      - name: Run static site checks
+        run: pytest tests/test_site.py -q
 
   build:
     name: Build Package

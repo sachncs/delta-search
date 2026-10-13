@@ -253,7 +253,7 @@ def export_solution_graph(
         data["metadata"] = metadata
 
     with open(path, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2, default=str)
+        json.dump(data, f, indent=2)
 
 
 def solution_summary(

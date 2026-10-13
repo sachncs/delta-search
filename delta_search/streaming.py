@@ -216,10 +216,9 @@ class StreamingSolver(Generic[NodeT]):
             raise ValueError(f"max_iterations must be positive, got {max_iterations}")
 
         with attach_observer(self.problem, observer):
-
             updates_applied = self._apply_updates()
 
-        # Determine starting state
+            # Determine starting state
             if resume and self._best_state is not None:
                 state = self._best_state
                 current_objective = self._best_objective
@@ -292,7 +291,7 @@ class StreamingSolver(Generic[NodeT]):
                 )
                 self.problem.on_iteration_end(state, iteration)
 
-            # Check termination
+                # Check termination
                 if (
                     self.early_stop.max_time_ms is not None
                     and elapsed_total >= self.early_stop.max_time_ms
@@ -326,7 +325,7 @@ class StreamingSolver(Generic[NodeT]):
 
             elapsed_ms = (time.monotonic() - start_time) * 1000
 
-        # Persist best state for resume
+            # Persist best state for resume
             self._best_state = best_state
             self._best_objective = best_objective
 

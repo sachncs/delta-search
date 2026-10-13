@@ -225,8 +225,10 @@ class LearnedGuidanceSolver(Generic[NodeT]):
         self.n_estimators = n_estimators
         self.max_depth = max_depth
         self.learning_rate = learning_rate
-        self.random_state = random_state if random_state is not None else (
-            default_seed() if default_seed() is not None else 42
+        self.random_state = (
+            random_state
+            if random_state is not None
+            else (default_seed() if default_seed() is not None else 42)
         )
         self._training_data: list[tuple[dict[str, float], float]] = []
         self._model: Any = None
@@ -252,7 +254,6 @@ class LearnedGuidanceSolver(Generic[NodeT]):
             raise ValueError(f"max_iterations must be positive, got {max_iterations}")
 
         with attach_observer(self.problem, observer):
-
             state = self.problem.evaluate_initial_state(self.problem.graph)
             current_objective = self.problem.objective(state)
 
@@ -281,8 +282,11 @@ class LearnedGuidanceSolver(Generic[NodeT]):
                     convergence_reason = "no actions available"
                     break
 
-            # Score actions
-                if self._model is not None and self._rng.random() >= self.exploration_rate:
+                # Score actions
+                if (
+                    self._model is not None
+                    and self._rng.random() >= self.exploration_rate
+                ):
                     scored = self._score_actions(
                         state,
                         actions,
@@ -296,14 +300,18 @@ class LearnedGuidanceSolver(Generic[NodeT]):
                     )
                     total_evaluations += 1
                 else:
-                # Greedy fallback or exploration
+                    # Greedy fallback or exploration
                     best_action = None
                     best_action_obj = float("-inf")
                     for action in actions:
                         delta = self.problem.calculate_delta(state, action)
                         if not delta.feasible:
                             continue
-                        obj = current_objective + delta.reward_change - delta.penalty_change
+                        obj = (
+                            current_objective
+                            + delta.reward_change
+                            - delta.penalty_change
+                        )
                         total_evaluations += 1
                         if obj > best_action_obj:
                             best_action_obj = obj
@@ -314,7 +322,7 @@ class LearnedGuidanceSolver(Generic[NodeT]):
                     convergence_reason = "no feasible actions"
                     break
 
-            # Record training data
+                # Record training data
                 features = _extract_features(
                     self.problem,
                     state,
@@ -324,7 +332,7 @@ class LearnedGuidanceSolver(Generic[NodeT]):
                 improvement = best_action_obj - current_objective
                 self._training_data.append((features, improvement))
 
-# Retrain model periodically
+                # Retrain model periodically
                 if (
                     iteration % self.train_every == 0
                     and len(self._training_data) >= self.min_samples
@@ -357,7 +365,7 @@ class LearnedGuidanceSolver(Generic[NodeT]):
                 )
                 self.problem.on_iteration_end(state, iteration)
 
-            # Check termination
+                # Check termination
                 if (
                     self.early_stop.max_time_ms is not None
                     and elapsed_total >= self.early_stop.max_time_ms
@@ -407,36 +415,36 @@ class LearnedGuidanceSolver(Generic[NodeT]):
             }
 
     def _score_actions(
-            self,
-            state: SubgraphState[NodeT],
-            actions: list[Action],
-            current_objective: float,
+        self,
+        state: SubgraphState[NodeT],
+        actions: list[Action],
+        current_objective: float,
     ) -> list[tuple[Action, float]]:
-            """Score actions using the trained model.
+        """Score actions using the trained model.
 
-            Args:
-                state: The current state.
-                actions: Candidate actions.
-                current_objective: Current objective value.
+        Args:
+            state: The current state.
+            actions: Candidate actions.
+            current_objective: Current objective value.
 
-            Returns:
-                List of (action, predicted_score) sorted by score descending.
+        Returns:
+            List of (action, predicted_score) sorted by score descending.
 
-            """
-            if self._model is None:
-                return [(a, 0.0) for a in actions]
+        """
+        if self._model is None:
+            return [(a, 0.0) for a in actions]
 
-            scores: list[tuple[Action, float]] = []
-            for action in actions:
-                features = _extract_features(
-                    self.problem,
-                    state,
-                    action,
-                    current_objective,
-                )
-                feature_values = [features.get(k, 0.0) for k in sorted(features)]
-                prediction = self._model.predict([feature_values])[0]
-                scores.append((action, float(prediction)))
+        scores: list[tuple[Action, float]] = []
+        for action in actions:
+            features = _extract_features(
+                self.problem,
+                state,
+                action,
+                current_objective,
+            )
+            feature_values = [features.get(k, 0.0) for k in sorted(features)]
+            prediction = self._model.predict([feature_values])[0]
+            scores.append((action, float(prediction)))
 
-            scores.sort(key=lambda x: x[1], reverse=True)
-            return scores
+        scores.sort(key=lambda x: x[1], reverse=True)
+        return scores

@@ -219,10 +219,10 @@ def cmd_solve(args: argparse.Namespace) -> int:
 
     if args.output:
         with open(args.output, "w") as f:
-            json.dump(output, f, indent=2, default=str)
+            json.dump(output, f, indent=2)
         logger.info(f"Solution written to {args.output}")
     else:
-        logger.info(json.dumps(output, indent=2, default=str))
+        logger.info(json.dumps(output, indent=2))
 
     return 0
 

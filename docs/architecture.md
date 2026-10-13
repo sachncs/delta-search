@@ -43,7 +43,7 @@ Node types must satisfy the `Node` protocol: `__hash__` + `__lt__`.
 - `delta_add_node(node)` — O(1)
 - `delta_remove_node(node)` — O(degree)
 
-**Thread-safe variant:** `ThreadSafeGraph[NodeT]` wraps `Graph` with `RLock` for concurrent access. All public methods (including reads like `subgraph`, `node_list`, `degree_sequence`, `is_subgraph_of`) acquire the lock.
+**Thread-safe variant:** `ThreadSafeGraph[NodeT]` wraps mutating and snapshot-producing operations with an `RLock`. The `nodes` and `edges` properties intentionally expose live views and are not consistent snapshots; callers needing a multi-read snapshot must hold `graph.lock` or use `node_list()`/`sorted_edges()`.
 
 ### `delta_search/problem.py`
 
@@ -207,8 +207,12 @@ The `SolverObserver` protocol allows external code to monitor solver behavior:
 
 ```python
 class SolverObserver(Protocol):
-    def on_action_evaluated(self, action: Action, delta: DeltaResult, elapsed_ms: float) -> None: ...
-    def on_iteration_complete(self, iteration: int, best_action: Action | None, objective: float) -> None: ...
+    def on_action_evaluated(
+        self, action: Action, delta: DeltaResult, elapsed_ms: float
+    ) -> None: ...
+    def on_iteration_complete(
+        self, iteration: int, best_action: Action | None, objective: float
+    ) -> None: ...
     def on_convergence(self, iterations: int, final_objective: float) -> None: ...
 ```
 

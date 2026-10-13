@@ -160,6 +160,7 @@ class UndoEntry(NamedTuple):
     edge_data: dict[str, Any] | None = None
     node_data: dict[str, Any] | None = None
     neighbor_data: dict[Any, dict[str, Any]] | None = None
+    created_nodes: tuple[Any, ...] = ()
 
 
 @runtime_checkable
@@ -666,12 +667,14 @@ class SubgraphExtractionProblem(abc.ABC, Generic[NodeT]):
 
         elif action.action_type is ActionType.ADD_EDGE:
             eu, ev = action.targets[0], action.targets[1]
+            created_nodes = tuple(node for node in (eu, ev) if not graph.has_node(node))
             existing = dict(graph.edge_data(eu, ev))
             graph.add_edge(eu, ev)
             undo = UndoEntry(
                 action_type=ActionType.REMOVE_EDGE,
                 targets=action.targets,
                 edge_data=existing if existing else None,
+                created_nodes=created_nodes,
             )
 
         elif action.action_type is ActionType.REMOVE_EDGE:
@@ -727,6 +730,9 @@ class SubgraphExtractionProblem(abc.ABC, Generic[NodeT]):
         elif undo.action_type is ActionType.REMOVE_EDGE:
             u, v = undo.targets[0], undo.targets[1]
             graph.remove_edge(u, v)
+            for node in undo.created_nodes:
+                if graph.has_node(node) and graph.degree(node) == 0:
+                    graph.remove_node(node)
 
         elif undo.action_type is ActionType.ADD_EDGE:
             u, v = undo.targets[0], undo.targets[1]

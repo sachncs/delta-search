@@ -1,19 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="DeltaSearch logo">
-  <title>DeltaSearch</title>
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#17171E"/>
-      <stop offset="1" stop-color="#0A0A0E"/>
-    </linearGradient>
-    <linearGradient id="accent" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#8A7CFF"/>
-      <stop offset="1" stop-color="#4CC9F0"/>
-    </linearGradient>
-  </defs>
-
-  <rect width="64" height="64" rx="14" fill="url(#bg)"/>
-
-  <path d="M32 16 L50 47 L14 47 Z" fill="none" stroke="url(#accent)" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
-
-  <circle cx="32" cy="36" r="3" fill="#F5F5F7"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="DeltaSearch mark">
+  <rect width="64" height="64" rx="14" fill="#111318"/>
+  <path d="M14 46 32 14l18 32" fill="none" stroke="#88A0FF" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M17 46h30" fill="none" stroke="#5367E8" stroke-width="5" stroke-linecap="round"/>
+  <path d="M25 35h14" fill="none" stroke="#FF7A66" stroke-width="3" stroke-linecap="round" stroke-dasharray="2 4"/>
+  <circle cx="14" cy="46" r="4" fill="#F7F8FA"/>
+  <circle cx="32" cy="14" r="4" fill="#F7F8FA"/>
+  <circle cx="50" cy="46" r="4" fill="#B8F36B"/>
 </svg>

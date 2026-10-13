@@ -57,6 +57,7 @@ class MyObserver:
     def on_convergence(self, iterations, final_objective):
         print(f"Converged after {iterations} iterations")
 
+
 solver = GreedySolver(problem)
 result = solver.solve(max_iterations=100, observer=MyObserver())
 ```
@@ -92,11 +93,11 @@ Use `EarlyTerminationCondition`:
 from delta_search import EarlyTerminationCondition, GreedySolver
 
 stop = EarlyTerminationCondition(
-    max_iterations=200,      # iteration budget
-    max_evaluations=10000,   # evaluation budget
-    max_time_ms=5000.0,      # wall-clock timeout
-    objective_target=10.0,   # stop when objective reaches target
-    stall_iterations=20,     # stop after N iterations with no improvement
+    max_iterations=200,  # iteration budget
+    max_evaluations=10000,  # evaluation budget
+    max_time_ms=5000.0,  # wall-clock timeout
+    objective_target=10.0,  # stop when objective reaches target
+    stall_iterations=20,  # stop after N iterations with no improvement
 )
 
 solver = GreedySolver(problem, early_stop=stop)

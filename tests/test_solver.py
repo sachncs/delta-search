@@ -138,6 +138,14 @@ class TestEarlyTerminationCondition:
         assert c.objective_target is None
         assert c.stall_iterations is None
 
+    @pytest.mark.parametrize(
+        "field",
+        ["max_iterations", "max_evaluations", "max_time_ms", "stall_iterations"],
+    )
+    def test_rejects_non_positive_limits(self, field: str) -> None:
+        with pytest.raises(ValueError):
+            EarlyTerminationCondition(**{field: 0})
+
 
 class TestSolverEdgeCases:
     def test_max_iterations_zero_raises(self) -> None:

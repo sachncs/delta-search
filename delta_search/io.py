@@ -1,6 +1,8 @@
 """Graph file I/O utilities.
 
-Supports loading and saving graphs in JSON format.
+    Supports loading and saving graphs in JSON format. Node identifiers and
+    attributes must be JSON-serializable; unsupported values raise ``TypeError``
+    instead of being silently coerced.
 
 Format::
 
@@ -60,7 +62,7 @@ def save_graph(graph: Graph[NodeT], path: str | Path) -> None:
     data = {"nodes": nodes, "edges": edges}
 
     with open(path, "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=2, default=str)
+        json.dump(data, f, indent=2)
 
 
 def load_graph(path: str | Path) -> Graph[Any]:
@@ -89,6 +91,9 @@ def load_graph(path: str | Path) -> Graph[Any]:
         )
     if "nodes" not in data and "edges" not in data:
         raise ValueError("Graph JSON must contain 'nodes' and/or 'edges' keys")
+    for key in ("nodes", "edges"):
+        if key in data and not isinstance(data[key], list):
+            raise ValueError(f"Graph JSON '{key}' value must be an array")
 
     graph: Graph[Any] = Graph()
 
@@ -97,6 +102,8 @@ def load_graph(path: str | Path) -> Graph[Any]:
             raise ValueError(
                 f"Each node entry must be a dict, got {type(node_entry).__name__}"
             )
+        if "id" not in node_entry:
+            raise ValueError("Each node entry must contain an 'id'")
         node_id = node_entry["id"]
         attrs = {k: v for k, v in node_entry.items() if k != "id"}
         graph.add_node(node_id, **attrs)
@@ -106,6 +113,8 @@ def load_graph(path: str | Path) -> Graph[Any]:
             raise ValueError(
                 f"Each edge entry must be a dict, got {type(edge_entry).__name__}"
             )
+        if "source" not in edge_entry or "target" not in edge_entry:
+            raise ValueError("Each edge entry must contain 'source' and 'target'")
         source = edge_entry["source"]
         target = edge_entry["target"]
         attrs = {k: v for k, v in edge_entry.items() if k not in ("source", "target")}

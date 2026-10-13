@@ -86,6 +86,19 @@ class EarlyTerminationCondition(Generic[NodeT]):
     objective_target: float | None = None
     stall_iterations: int | None = None
 
+    def __post_init__(self) -> None:
+        """Reject impossible budgets before a solver starts."""
+        integer_limits = {
+            "max_iterations": self.max_iterations,
+            "max_evaluations": self.max_evaluations,
+            "stall_iterations": self.stall_iterations,
+        }
+        for name, value in integer_limits.items():
+            if value is not None and value <= 0:
+                raise ValueError(f"{name} must be positive when set")
+        if self.max_time_ms is not None and self.max_time_ms <= 0:
+            raise ValueError("max_time_ms must be positive when set")
+
 
 class GreedySolver(Generic[NodeT]):
     """Greedy optimization loop for delta search problems.
