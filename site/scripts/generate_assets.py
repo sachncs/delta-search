@@ -27,6 +27,11 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Circle
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
+try:
+    import networkx as nx
+except ImportError:  # pragma: no cover - asset generation has an optional path
+    nx = None
+
 from delta_search import (
     Action,
     DefaultState,
@@ -49,8 +54,8 @@ VIOLET = "#5367E8"
 CYAN = "#B8F36B"
 EDGE_INPUT = "#2A2A34"
 NODE_INPUT = "#202028"
-EDGE_SOLUTION = "#6E8CFF"
-NODE_SOLUTION = "#A8A0FF"
+EDGE_SOLUTION = "#88A0FF"
+NODE_SOLUTION = "#C5F36C"
 
 plt.rcParams.update(
     {
@@ -74,7 +79,8 @@ class PlanarDemoProblem(MaximumPlanarSubgraphProblem):
 
     The stock implementation seeds an empty subgraph for this monotone
     (edge-add-only) problem; for the demo we seed all vertices and let
-    the solver select a maximum-edge planar subgraph on top of them.
+    the solver select a maximum-edge subgraph screened by the repository's
+    Euler-bound feasibility heuristic.
     """
 
     def evaluate_initial_state(self, graph: Graph[int]) -> DefaultState[int]:
@@ -180,6 +186,66 @@ def force_layout(
     }
 
 
+def representative_edges(
+    graph: Graph[int], extra_edges: int = 42
+) -> set[frozenset[int]]:
+    """Return a readable, connected sample of a solved graph's edges.
+
+    A 62-node planar solution can contain 180 edges. Drawing all of them makes
+    the marketing image a hairball, so the image shows a spanning forest plus a
+    deterministic sample of additional retained edges. The solve itself is not
+    truncated; this is only a presentation view.
+    """
+    selected: set[frozenset[int]] = set()
+    visited: set[int] = set()
+
+    for root in sorted(graph.nodes):
+        if root in visited:
+            continue
+        visited.add(root)
+        queue = [root]
+        while queue:
+            node = queue.pop(0)
+            for neighbor in sorted(graph.neighbors(node)):
+                if neighbor in visited:
+                    continue
+                visited.add(neighbor)
+                queue.append(neighbor)
+                selected.add(frozenset((node, neighbor)))
+
+    remaining = [
+        frozenset((u, v))
+        for u, v in graph.sorted_edges()
+        if frozenset((u, v)) not in selected
+    ]
+    selected.update(remaining[:extra_edges])
+    return selected
+
+
+def solution_layout(
+    solution: Graph[int], seed: int = 3
+) -> dict[int, tuple[float, float]]:
+    """Prefer a planar embedding, with a deterministic force fallback."""
+    if nx is not None:
+        nx_graph = nx.Graph()
+        nx_graph.add_nodes_from(solution.nodes)
+        nx_graph.add_edges_from(solution.sorted_edges())
+        if nx.check_planarity(nx_graph)[0]:
+            raw = nx.planar_layout(nx_graph, scale=1.0)
+            xs = [float(raw[node][0]) for node in solution.nodes]
+            ys = [float(raw[node][1]) for node in solution.nodes]
+            x_min, x_max = min(xs), max(xs)
+            y_min, y_max = min(ys), max(ys)
+            return {
+                node: (
+                    (float(raw[node][0]) - x_min) / max(x_max - x_min, 1e-9),
+                    1 - (float(raw[node][1]) - y_min) / max(y_max - y_min, 1e-9),
+                )
+                for node in solution.nodes
+            }
+    return force_layout(solution, seed=seed, iters=1200)
+
+
 # --- 3. render the solved graph --------------------------------------------
 def render_graph(
     graph: Graph[int], solution: Graph[int], pos: dict[int, tuple[float, float]]
@@ -193,12 +259,19 @@ def render_graph(
 
     sol_nodes = set(solution.nodes)
     sol_edges = {frozenset((u, v)) for u, v in solution.sorted_edges()}
+    display_edges = representative_edges(solution)
+    candidate_edges = [
+        frozenset((u, v))
+        for u, v in graph.sorted_edges()
+        if frozenset((u, v)) not in sol_edges
+    ]
+    display_edges.update(candidate_edges[:24])
 
     for u in graph.nodes:
         if u not in pos:
             continue
         x, y = pos[u]
-        glow = Circle((x, y), 0.028, facecolor=NODE_SOLUTION, alpha=0.16, zorder=1)
+        glow = Circle((x, y), 0.018, facecolor=NODE_SOLUTION, alpha=0.08, zorder=1)
         ax.add_patch(glow)
 
     for u in graph.nodes:
@@ -209,12 +282,15 @@ def render_graph(
                 continue
             if u not in pos:
                 continue
+            edge_key = frozenset((u, v))
+            if edge_key not in display_edges:
+                continue
             x1, y1 = pos[u]
             x2, y2 = pos[v]
-            in_sol = frozenset((u, v)) in sol_edges
+            in_sol = edge_key in sol_edges
             color = EDGE_SOLUTION if in_sol else EDGE_INPUT
-            alpha = 0.95 if in_sol else 0.5
-            lw = 2.0 if in_sol else 0.9
+            alpha = 0.78 if in_sol else 0.22
+            lw = 1.5 if in_sol else 0.7
             zorder = 4 if in_sol else 0
             ax.plot(
                 [x1, x2],
@@ -335,10 +411,10 @@ def radial_glow(
 def make_og() -> None:
     width, height = 1200, 630
     bg = Image.new("RGB", (width, height), (11, 11, 15))
-    purple = radial_glow((width, height), (width - 300, 140), 560, (94, 78, 255), 110)
-    cyan = radial_glow((width, height), (160, height - 120), 460, (76, 201, 240), 60)
-    bg.paste(purple, (0, 0), purple)
-    bg.paste(cyan, (0, 0), cyan)
+    blue = radial_glow((width, height), (width - 300, 140), 560, (83, 103, 232), 95)
+    lime = radial_glow((width, height), (160, height - 120), 460, (197, 243, 108), 34)
+    bg.paste(blue, (0, 0), blue)
+    bg.paste(lime, (0, 0), lime)
 
     draw = ImageDraw.Draw(bg, "RGBA")
 
@@ -367,49 +443,51 @@ def make_og() -> None:
             x2 = cx
             y2 = cy - size + inset
             top = (
-                int(138 + (76 - 138) * t),
-                int(124 + (201 - 124) * t),
-                int(255 + (240 - 255) * t),
+                int(136 + (197 - 136) * t),
+                int(168 + (243 - 168) * t),
+                int(255 + (108 - 255) * t),
             )
             draw.polygon([(x0, y0), (x1, y1), (x2, y2)], fill=(*top, 255))
 
     draw_delta(draw, 250, 330, 138)
-    draw.line([(120, 300), (120, 368)], fill=(138, 124, 255, 255), width=6)
+    draw.line([(120, 300), (120, 368)], fill=(136, 168, 255, 255), width=6)
 
     draw.text((420, 190), "delta-search", font=font_bold, fill=(245, 245, 247, 255))
     draw.text(
         (420, 268),
-        "Heuristic search for NP-hard subgraph extraction",
+        "Heuristic graph search",
         font=font_ultra,
         fill=(245, 245, 247, 255),
     )
     draw.text(
         (420, 360),
-        "O(1) incremental deltas \u00b7 6 problem types \u00b7 zero dependencies",
+        "Alpha \u00b7 local install \u00b7 6 problem types",
         font=font_light,
         fill=(154, 155, 166, 255),
     )
 
-    pill = (94, 78, 255, 255)
-    px1, py1, px2, py2 = 420, 452, 618, 508
+    pill = (83, 103, 232, 255)
+    px1, py1, px2, py2 = 420, 452, 620, 508
     draw.rounded_rectangle([px1, py1, px2, py2], radius=28, fill=pill)
-    draw.text(
-        (452, 466), "Get started on GitHub", font=font_med, fill=(245, 245, 247, 255)
-    )
+    draw.text((454, 466), "Read the docs", font=font_med, fill=(245, 245, 247, 255))
 
     bg.save(ASSETS / "og.png")
+    bg.save(Path(__file__).resolve().parents[2] / ".github/assets/social-preview.png")
 
 
 def main() -> None:
     graph = build_input_graph()
     solution, objectives, iterations = solve_mps(graph)
-    pos = force_layout(graph)
+    # Layout the retained solution first. The input graph can be dense;
+    # using it as the layout makes the result read as a hairball instead of a
+    # solution. Candidate edges still render faintly on the same coordinates.
+    pos = solution_layout(solution)
     render_graph(graph, solution, pos)
     render_convergence(iterations, objectives)
     make_og()
     print(
         f"solved: {graph.num_nodes} nodes / {graph.num_edges} edges -> "
-        f"{solution.num_edges} retained edges (planar cap {solve_cap(solution.num_nodes)})"
+        f"{solution.num_edges} retained edges (Euler cap {solve_cap(solution.num_nodes)})"
     )
     print(
         f"convergence: {len(iterations)} iterations tracked, final objective {objectives[-1]:.1f}"
