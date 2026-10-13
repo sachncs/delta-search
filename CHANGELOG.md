@@ -45,8 +45,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Removed `__del__` IO cleanup from `StreamingObserver` (unsafe at
   interpreter shutdown)
 - All `open()` calls now pass `encoding="utf-8"`
-- Replaced misleading PyPI badge (no release published) with install
-  badge; cut v0.1.0 tag and release to unblock downstream
+- Replaced misleading PyPI badge with explicit alpha / PyPI-coming-soon
+  messaging; package publication remains a future milestone
 - Renamed `is_planary` to `is_planar` (correct spelling) and kept
   `is_planary` as a deprecated alias for backward compatibility
 - `apply_action` docstring now spells out the deepcopy cost; opt-in
@@ -116,8 +116,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Command-line interface with solve and validate commands
 - Full test suite (320 tests) with 80%+ coverage
 - CI/CD pipeline with lint, typecheck, security scan, tests, and build
-- PyPI release automation via GitHub Actions
-- Documentation: getting-started, architecture, FAQ
+- Release workflow prepared for a future PyPI publication
+- Standalone developer documentation is published under `site/docs/`
 - Community files: CONTRIBUTING, CODE_OF_CONDUCT, SECURITY
 - PEP 561 typed package with `py.typed` marker
 - Zero runtime dependencies
